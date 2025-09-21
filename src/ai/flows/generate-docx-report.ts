@@ -8,7 +8,7 @@
  * - GenerateDocxReportInput - The input type for the flow.
  * - GenerateDocxReportOutput - The return type for the flow.
  */
-
+import 'server-only';
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import htmlToDocx from 'html-to-docx';
