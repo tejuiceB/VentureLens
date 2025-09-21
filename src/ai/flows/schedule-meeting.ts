@@ -11,7 +11,7 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
-const ScheduleMeetingInputSchema = z.object({
+export const ScheduleMeetingInputSchema = z.object({
   startupName: z.string().describe('The name of the startup to meet with.'),
   investorName: z.string().describe("The investor's name."),
   investorEmail: z.string().email().describe("The investor's email address."),
@@ -19,7 +19,7 @@ const ScheduleMeetingInputSchema = z.object({
 });
 export type ScheduleMeetingInput = z.infer<typeof ScheduleMeetingInputSchema>;
 
-const ScheduleMeetingOutputSchema = z.object({
+export const ScheduleMeetingOutputSchema = z.object({
   meetingLink: z.string().describe('A URL for the generated Google Meet link.'),
   confirmationMessage: z.string().describe('A confirmation message for the user.'),
 });

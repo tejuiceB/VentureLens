@@ -51,7 +51,7 @@ const reportGenerationPrompt = ai.definePrompt({
 4.  **Reweight the analysis** based on the provided investor preferences: {{{investorCriteria}}}.
 5.  **Produce the following three assets**:
     a.  **Investment Memo**: A detailed memo in Markdown format. It MUST include these exact headings: '### Executive Summary', '### Problem & Solution', '### Founder & Team', '### Market Opportunity', '### Competition & Differentiation', '### KPIs & Traction', '### Risks', '### Funding Ask & Use of Funds', and '### Recommendation'. The recommendation must be weighted and justified based on the investor's preferences.
-    b.  **Audio Summary Script**: A compelling, concise script for an audio overview based on the investment memo. It should not be too short or too long, aiming for a 2-3 minute read time.
+    b.  **Audio Summary Script**: A compelling, concise script for an audio overview based on the investment memo. It should not be too short or too long, aiming for a 2-3 minute read time. The script should be derived from the '### Executive Summary', '### Problem & Solution', and '### Recommendation' sections.
     c.  **Flashcards**: A JSON array of 5-10 key questions and answers an investor should know, derived from the memo. Each object in the array should have a "question" and "answer" key. If you cannot generate flashcards, return an empty array.
 
 **Analyze the following documents, founder notes, and investor preferences:**
@@ -93,7 +93,7 @@ const notebookLmReportFlow = ai.defineFlow(
     try {
         const { output } = await reportGenerationPrompt(input);
         
-        if (!output?.investmentMemo) {
+        if (!output) {
              throw new Error("The AI model returned an empty or invalid response. This may be due to the content of the uploaded documents or a temporary model issue.");
         }
 
