@@ -17,7 +17,6 @@ const FileDataSchema = z.object({
   dataUri: z.string().describe("The file content as a data URI. Expected format: 'data:<mimetype>;base64,<encoded_data>'."),
 });
 
-export type NotebookLmReportInput = z.infer<typeof NotebookLmReportInputSchema>;
 const NotebookLmReportInputSchema = z.object({
   files: z.array(FileDataSchema).describe('An array of files to be analyzed.'),
   investorCriteria: z
@@ -28,8 +27,8 @@ const NotebookLmReportInputSchema = z.object({
   founderInput: z.string().optional().describe('Direct input or answers from the founder.'),
   startupComparison: z.array(z.string()).optional().describe('An optional list of startup names (from the matching tool) to compare the uploaded documents against.'),
 });
+export type NotebookLmReportInput = z.infer<typeof NotebookLmReportInputSchema>;
 
-export type NotebookLmReportOutput = z.infer<typeof NotebookLmReportOutputSchema>;
 const NotebookLmReportOutputSchema = z.object({
   investmentMemo: z.string().describe("A detailed investment memo in Markdown format, including sections for executive summary, problem/solution, team, market, competition, KPIs, risks, funding ask, and recommendation."),
   audioSummary: z.string().describe('A script for an audio summary of the investment memo, focusing on the core details and significant aspects.'),
@@ -38,6 +37,7 @@ const NotebookLmReportOutputSchema = z.object({
     answer: z.string(),
   })).describe('An array of flashcards with key questions and answers from the memo.'),
 });
+export type NotebookLmReportOutput = z.infer<typeof NotebookLmReportOutputSchema>;
 
 const reportGenerationPrompt = ai.definePrompt({
   name: 'reportGenerationPrompt',
@@ -51,7 +51,7 @@ const reportGenerationPrompt = ai.definePrompt({
 4.  **Reweight the analysis** based on the provided investor preferences: {{{investorCriteria}}}.
 5.  **Produce the following three assets**:
     a.  **Investment Memo**: A detailed memo in Markdown format. It MUST include these exact headings: '### Executive Summary', '### Problem & Solution', '### Founder & Team', '### Market Opportunity', '### Competition & Differentiation', '### KPIs & Traction', '### Risks', '### Funding Ask & Use of Funds', and '### Recommendation'. The recommendation must be weighted and justified based on the investor's preferences.
-    b.  **Audio Summary Script**: A compelling, concise script for an audio overview. It should be derived from the 'Executive Summary', 'Problem & Solution', and 'Recommendation' sections of the memo. It should not be too short or too long, aiming for a 2-3 minute read time.
+    b.  **Audio Summary Script**: A compelling, concise script for an audio overview based on the investment memo. It should not be too short or too long, aiming for a 2-3 minute read time.
     c.  **Flashcards**: A JSON array of 5-10 key questions and answers an investor should know, derived from the memo. Each object in the array should have a "question" and "answer" key. If you cannot generate flashcards, return an empty array.
 
 **Analyze the following documents, founder notes, and investor preferences:**
