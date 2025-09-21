@@ -31,6 +31,8 @@ export type NotebookLmReportInput = z.infer<typeof NotebookLmReportInputSchema>;
 
 const NotebookLmReportOutputSchema = z.object({
   investmentMemo: z.string().describe("A detailed investment memo in Markdown format, including sections for executive summary, problem/solution, team, market, competition, KPIs, risks, funding ask, and recommendation."),
+  audioSummary: z.string().describe("A concise script for a 2-3 minute audio overview, summarizing the key points of the investment memo. It should be engaging and easy to understand for a busy investor."),
+  flashcards: z.string().describe("A set of 5-10 flashcards in Markdown format. Each flashcard should have a 'Term' and a 'Definition' on a new line. For example: 'Term: ARR\nDefinition: Annual Recurring Revenue.'"),
 });
 export type NotebookLmReportOutput = z.infer<typeof NotebookLmReportOutputSchema>;
 
@@ -38,18 +40,11 @@ const reportGenerationPrompt = ai.definePrompt({
   name: 'reportGenerationPrompt',
   input: { schema: NotebookLmReportInputSchema },
   output: { schema: NotebookLmReportOutputSchema },
-  prompt: `You are an expert investment analyst. Your task is to produce a comprehensive investment memo based on the provided documents.
+  prompt: `You are an expert investment analyst. Your task is to produce a comprehensive investment memo, an audio summary script, and a set of flashcards based on the provided documents.
 
-1.  **Parse all available inputs**: uploaded documents, founder notes, and investor criteria. If some of the documents are unreadable or corrupt, you MUST ignore them and proceed with the analysis based on the valid information. Do not fail the entire process.
-2.  **Extract structured data** and simulate enriching it with publicly available data. **If you use any external data, you MUST cite your source inline (e.g., "[Source: TechCrunch, 2023]").**
-3.  **Evaluate the investment thesis** based on the data, analyzing the Founder & Team, Market Size, Competition, KPIs, and Differentiation.
-4.  **Reweight the analysis** based on the provided investor preferences: {{{investorCriteria}}}.
-5.  **Produce an Investment Memo**: A detailed memo in Markdown format. It MUST include these exact headings: '### Executive Summary', '### Problem & Solution', '### Founder & Team', '### Market Opportunity', '### Competition & Differentiation', '### KPIs & Traction', '### Risks', '### Funding Ask & Use of Funds', and '### Recommendation'. The recommendation must be weighted and justified based on the investor's preferences.
-
-**Analyze the following documents, founder notes, and investor preferences:**
-- **Investor Preferences**: {{{investorCriteria}}}
-- **Founder Input (if any)**: {{#if founderInput}}{{{founderInput}}}{{else}}N/A{{/if}}
-- **Startup Documents**:
+**Investor Preferences**: {{{investorCriteria}}}
+**Founder Input (if any)**: {{#if founderInput}}{{{founderInput}}}{{else}}N/A{{/if}}
+**Startup Documents**:
 {{#each files}}
 ---
 File: {{{name}}}
@@ -63,7 +58,15 @@ Content:
 Compare the primary startup against these companies: {{#each startupComparison}}{{#if @index}}, {{/if}}{{{this}}}{{/each}}. Integrate this comparison into the 'Competition & Differentiation' and 'Recommendation' sections of the investment memo.
 {{/if}}
 
-Now, execute the workflow and generate the final investment memo.
+---
+
+**YOUR TASKS:**
+
+1.  **Produce an Investment Memo**: A detailed memo in Markdown format. It MUST include these exact headings: '### Executive Summary', '### Problem & Solution', '### Founder & Team', '### Market Opportunity', '### Competition & Differentiation', '### KPIs & Traction', '### Risks', '### Funding Ask & Use of Funds', and '### Recommendation'. The recommendation must be weighted and justified based on the investor's preferences.
+2.  **Create an Audio Summary Script**: Write a script for a 2-3 minute audio overview. This should be a compelling summary of the entire investment memo, hitting the most critical points an investor needs to hear. The tone should be professional and engaging.
+3.  **Generate Flashcards**: Create a set of 5 to 10 flashcards in Markdown format. Each flashcard must define a key term, metric, or concept found in the documents. Use the format: 'Term: [Term Name]\\nDefinition: [The definition]'.
+
+Execute the workflow and generate all three outputs. If some of the documents are unreadable or corrupt, you MUST ignore them and proceed with the analysis based on the valid information. Do not fail the entire process.
 `,
 });
 
@@ -82,12 +85,16 @@ const notebookLmReportFlow = ai.defineFlow(
     outputSchema: NotebookLmReportOutputSchema,
   },
   async (input) => {
-    const { output } = await reportGenerationPrompt(input);
-
-    if (!output?.investmentMemo) {
-      throw new Error("The AI model returned an empty or invalid response. This may be due to the content of the uploaded documents or a temporary model issue.");
+    try {
+      const { output } = await reportGenerationPrompt(input);
+      if (!output) {
+        throw new Error("The AI model returned a null response.");
+      }
+      return output;
+    } catch (error: any) {
+      console.error("Error in notebookLmReportFlow:", error);
+      throw new Error(`Failed to generate analysis. The model may have failed to return a valid response. Original error: ${error.message}`);
     }
-    
-    return output;
   }
 );
+

@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { FileUp, Loader2, Trash2, BotMessageSquare, ShieldCheck, Video, Link as LinkIcon } from "lucide-react";
+import { FileUp, Loader2, Trash2, BotMessageSquare, ShieldCheck, Video, Link as LinkIcon, Download, Music, RectangleStack, Play } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { generateNotebookLmReport, type NotebookLmReportOutput, type NotebookLmReportInput } from "@/ai/flows/notebook-lm-report-generation";
 import { investorRiskAssessment, type InvestorRiskAssessmentOutput, type InvestorRiskAssessmentInput } from "@/ai/flows/investor-risk-assessment";
@@ -24,6 +24,10 @@ import { ReportDownloads } from "@/components/dashboard/report-downloads";
 import { MultiSelect } from "@/components/ui/multi-select";
 import { generateComplianceReport, type GenerateComplianceReportOutput, type GenerateComplianceReportInput } from "@/ai/flows/generate-compliance-report";
 import { scheduleMeeting, type ScheduleMeetingOutput, type ScheduleMeetingInput } from "@/ai/flows/schedule-meeting";
+import { textToSpeech } from "@/ai/flows/text-to-speech";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
+import { saveAs } from "file-saver";
 
 
 const currencies = ["INR", "USD", "EUR", "GBP", "JPY", "CAD", "AUD"];
@@ -41,6 +45,7 @@ export type InvestorProfile = InvestorRiskAssessmentInput & {
 
 export default function DashboardPage() {
   const [currentTab, setCurrentTab] = useState("profiler");
+  const [currentAnalysisTab, setCurrentAnalysisTab] = useState("memo");
   
   // NotebookLM Analyzer States
   const [dragActive, setDragActive] = useState(false);
@@ -51,6 +56,8 @@ export default function DashboardPage() {
   const [analyzerError, setAnalyzerError] = useState<string | null>(null);
   const [founderInput, setFounderInput] = useState("");
   const [selectedStartupsForAnalysis, setSelectedStartupsForAnalysis] = useState<string[]>([]);
+  const [audioDataUri, setAudioDataUri] = useState<string | null>(null);
+  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
 
 
   // Risk Profiler States
@@ -82,6 +89,7 @@ export default function DashboardPage() {
   const [complianceError, setComplianceError] = useState<string | null>(null);
 
   // Connect & Invest States
+  const [investorEmail, setInvestorEmail] = useState("");
   const [founderEmails, setFounderEmails] = useState("");
   const [meetingDetails, setMeetingDetails] = useState<ScheduleMeetingOutput | null>(null);
   const [isSchedulingMeeting, setIsSchedulingMeeting] = useState(false);
@@ -187,6 +195,7 @@ export default function DashboardPage() {
         setComplianceError(null);
         setMeetingDetails(null);
         setMeetingError(null);
+        setAudioDataUri(null);
         return updatedFiles;
     });
   };
@@ -201,6 +210,7 @@ export default function DashboardPage() {
             setComplianceError(null);
             setMeetingDetails(null);
             setMeetingError(null);
+            setAudioDataUri(null);
         }
         return newFiles;
     });
@@ -219,6 +229,7 @@ export default function DashboardPage() {
     setComplianceError(null);
     setMeetingDetails(null);
     setMeetingError(null);
+    setAudioDataUri(null);
 
     try {
       const fileProcessingPromises = uploadedFiles.map(file => {
@@ -294,6 +305,55 @@ export default function DashboardPage() {
     }
   };
 
+  const handleGenerateAudio = async () => {
+    if (!analysisResult?.audioSummary) {
+      setAnalyzerError("No audio summary script available to generate audio.");
+      return;
+    }
+    setIsGeneratingAudio(true);
+    setAnalyzerError(null);
+    try {
+      const result = await textToSpeech(analysisResult.audioSummary);
+      setAudioDataUri(result.audioDataUri);
+    } catch (err: any) {
+      console.error("Error generating audio:", err);
+      setAnalyzerError(err.message || "Failed to generate audio overview.");
+    } finally {
+      setIsGeneratingAudio(false);
+    }
+  };
+
+  const downloadFlashcards = () => {
+    if (!analysisResult?.flashcards) return;
+
+    const doc = new jsPDF();
+    const flashcards = analysisResult.flashcards.split("\n\n");
+    const data = flashcards.map(fc => {
+        const [term, definition] = fc.split('\n');
+        return [term?.replace('Term: ', ''), definition?.replace('Definition: ', '')];
+    }).filter(row => row[0] && row[1]);
+
+    (doc as any).autoTable({
+        head: [['Term', 'Definition']],
+        body: data,
+        styles: {
+            cellPadding: 3,
+            fontSize: 12,
+            valign: 'middle'
+        },
+        headStyles: {
+            fillColor: [35, 122, 122], // Deep Teal from theme
+            textColor: 255,
+            fontStyle: 'bold'
+        },
+        alternateRowStyles: {
+            fillColor: [224, 240, 240] // Light Teal
+        }
+    });
+
+    doc.save("flashcards.pdf");
+  };
+
   const handleGenerateProfile = async () => {
     if (!isProfilerFormValid) {
         setProfilerError("Please fill out all mandatory fields in the questionnaire.");
@@ -357,8 +417,8 @@ export default function DashboardPage() {
   }
 
   const handleScheduleMeeting = async () => {
-    if (!analysisResult || !founderEmails) {
-      setMeetingError("Please provide founder email(s).");
+    if (!analysisResult || !founderEmails || !investorEmail) {
+      setMeetingError("Please provide your email and at least one founder's email.");
       return;
     }
     setIsSchedulingMeeting(true);
@@ -376,6 +436,7 @@ export default function DashboardPage() {
       
       const input: ScheduleMeetingInput = {
         startupName,
+        investorEmail: investorEmail,
         founderEmails: emails
       };
       const result = await scheduleMeeting(input);
@@ -697,13 +758,80 @@ export default function DashboardPage() {
                                   <CardTitle className="font-headline text-xl flex items-center gap-2"><BotMessageSquare /> Analysis Complete</CardTitle>
                                   <CardDescription>Review the generated investment memo below.</CardDescription>
                               </div>
-                              <ReportDownloads memo={analysisResult.investmentMemo} />
                           </div>
                       </CardHeader>
                       <CardContent>
-                          <div className="prose prose-sm max-w-none dark:prose-invert">
-                              <ReactMarkdown>{analysisResult.investmentMemo}</ReactMarkdown>
-                          </div>
+                          <Tabs value={currentAnalysisTab} onValueChange={setCurrentAnalysisTab} className="w-full">
+                            <TabsList>
+                                <TabsTrigger value="memo">Investment Memo</TabsTrigger>
+                                <TabsTrigger value="audio">Audio Overview</TabsTrigger>
+                                <TabsTrigger value="flashcards">Flashcards</TabsTrigger>
+                            </TabsList>
+                            <TabsContent value="memo" className="mt-4">
+                               <div className="flex justify-end mb-4">
+                                 <ReportDownloads memo={analysisResult.investmentMemo} />
+                               </div>
+                                <div className="prose prose-sm max-w-none dark:prose-invert">
+                                    <ReactMarkdown>{analysisResult.investmentMemo}</ReactMarkdown>
+                                </div>
+                            </TabsContent>
+                             <TabsContent value="audio" className="mt-4">
+                                <Card>
+                                  <CardHeader>
+                                    <CardTitle>Audio Overview</CardTitle>
+                                    <CardDescription>A 2-3 minute audio summary of the investment memo.</CardDescription>
+                                  </CardHeader>
+                                  <CardContent className="space-y-4">
+                                      {!audioDataUri && (
+                                        <div className="flex flex-col items-center gap-4 text-center">
+                                          <p className="text-muted-foreground text-sm">Click the button to generate an audio version of the summary.</p>
+                                          <Button onClick={handleGenerateAudio} disabled={isGeneratingAudio}>
+                                            {isGeneratingAudio && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                            <Play className="mr-2 h-4 w-4" />
+                                            Generate Audio
+                                          </Button>
+                                        </div>
+                                      )}
+                                      {audioDataUri && (
+                                        <div className="space-y-4">
+                                          <audio controls src={audioDataUri} className="w-full"></audio>
+                                           <Button onClick={() => saveAs(audioDataUri, "audio-overview.wav")} variant="outline">
+                                            <Download className="mr-2 h-4 w-4" />
+                                            Download Audio (.wav)
+                                          </Button>
+                                        </div>
+                                      )}
+                                  </CardContent>
+                                </Card>
+                            </TabsContent>
+                            <TabsContent value="flashcards" className="mt-4">
+                                <Card>
+                                   <CardHeader>
+                                    <div className="flex justify-between items-start">
+                                      <div>
+                                        <CardTitle>Flashcards</CardTitle>
+                                        <CardDescription>Key terms and definitions from the documents.</CardDescription>
+                                      </div>
+                                       <Button onClick={downloadFlashcards} variant="outline">
+                                          <Download className="mr-2 h-4 w-4" />
+                                          Download PDF
+                                      </Button>
+                                    </div>
+                                  </CardHeader>
+                                  <CardContent className="space-y-2">
+                                      {analysisResult.flashcards.split('\n\n').map((card, index) => {
+                                          const [term, def] = card.split('\n');
+                                          return (
+                                              <div key={index} className="p-3 rounded-md bg-background text-sm">
+                                                  <p className="font-bold">{term?.replace('Term: ', '')}</p>
+                                                  <p className="text-muted-foreground">{def?.replace('Definition: ', '')}</p>
+                                              </div>
+                                          );
+                                      })}
+                                  </CardContent>
+                                </Card>
+                            </TabsContent>
+                          </Tabs>
                       </CardContent>
                   </Card>
               )}
@@ -771,6 +899,16 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="space-y-2">
+                   <Label htmlFor="investor-email">Your Email ID</Label>
+                   <Input 
+                      id="investor-email" 
+                      type="email"
+                      placeholder="e.g., jane.doe@example.com" 
+                      value={investorEmail}
+                      onChange={(e) => setInvestorEmail(e.target.value)}
+                    />
+                </div>
+                <div className="space-y-2">
                    <Label htmlFor="founder-emails">Founder Email(s)</Label>
                    <Textarea 
                       id="founder-emails" 
@@ -781,7 +919,7 @@ export default function DashboardPage() {
                     />
                 </div>
 
-                <Button onClick={handleScheduleMeeting} disabled={isSchedulingMeeting || !complianceReport || !founderEmails}>
+                <Button onClick={handleScheduleMeeting} disabled={isSchedulingMeeting || !complianceReport || !founderEmails || !investorEmail}>
                     {isSchedulingMeeting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     <Video className="mr-2 h-4 w-4" />
                     Schedule Meeting with Founder
@@ -824,3 +962,4 @@ export default function DashboardPage() {
 }
 
     
+

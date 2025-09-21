@@ -13,6 +13,7 @@ import { z } from 'genkit';
 
 const ScheduleMeetingInputSchema = z.object({
   startupName: z.string().describe('The name of the startup to meet with.'),
+  investorEmail: z.string().email().describe("The investor's email address."),
   founderEmails: z.array(z.string().email()).describe("The email addresses of the startup founders."),
 });
 export type ScheduleMeetingInput = z.infer<typeof ScheduleMeetingInputSchema>;
@@ -38,8 +39,9 @@ const scheduleMeetingFlow = ai.defineFlow(
     // with the Google Calendar API to create an event and generate a Meet link.
   },
   async (input) => {
+    const allEmails = [input.investorEmail, ...input.founderEmails];
     console.log(`Scheduling meeting with ${input.startupName}`);
-    console.log(`Sending invites to: ${input.founderEmails.join(', ')}`);
+    console.log(`Sending invites to: ${allEmails.join(', ')}`);
     
     // In a real implementation, you would:
     // 1. Authenticate with Google Calendar API using user's credentials (OAuth).
