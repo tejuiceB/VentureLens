@@ -1,0 +1,33 @@
+diff --git a/node_modules/html-to-docx/dist/html-to-docx.esm.js b/node_modules/html-to-docx/dist/html-to-docx.esm.js
+index 9e3c16c..8172c91 100644
+--- a/node_modules/html-to-docx/dist/html-to-docx.esm.js
++++ b/nodeModules/html-to-docx/dist/html-to-docx.esm.js
+@@ -1,5 +1,4 @@
+-import e from "fs";
+-import t from "stream";
++
+ import n from "path";
+ import r from "util";
+ import {
+diff --git a/node_modules/html-to-docx/dist/html-to-docx.umd.js b/node_modules/html-to-docx/dist/html-to-docx.umd.js
+index 7869689..3ca57c6 100644
+--- a/node_modules/html-to-docx/dist/html-to-docx.umd.js
++++ b/node_modules/html-to-docx/dist/html-to-docx.umd.js
+@@ -1,7 +1,7 @@
+ ! function(e, t) {
+-  "object" == typeof exports && "undefined" != typeof module ? module.exports = t(require("fs"), require("stream"), require("path"), require("util"), require("jszip"), require("lodash"), require("image-size"), require("universalify")) : "function" == typeof define && define.amd ? define(["fs", "stream", "path", "util", "jszip", "lodash", "image-size", "universalify"], t) : (e = "undefined" != typeof globalThis ? globalThis : e || self).htmlToDocx = t(e.fs, e.stream, e.path, e.util, e.JSZip, e.lodash, e.imageSize, e.universalify)
+-}(this, (function(e, t, n, r, o, i, a, s) {
++  "object" == typeof exports && "undefined" != typeof module ? module.exports = t(null, null, require("path"), require("util"), require("jszip"), require("lodash"), require("image-size"), require("universalify")) : "function" == typeof define && define.amd ? define(["fs", "stream", "path", "util", "jszip", "lodash", "image-size", "universalify"], t) : (e = "undefined" != typeof globalThis ? globalThis : e || self).htmlToDocx = t(e.fs, e.stream, e.path, e.util, e.JSZip, e.lodash, e.imageSize, e.universalify)
++}(this, (function(e, t, n, r, o, i, a, s) { "use strict";
+   var l = "default" in o ? o.default : o;
+ 
+   function u(e) {
+@@ -370,7 +370,7 @@
+     return e.replace(t, (() => (i++, `<w:br w:type="page"/>${n?"<w:p></w:p>":""}`)))
+   }
+   async function oe(e, t, o, i, a, s) {
+-    const l = await r.promisify(e.readFile)(t);
++    const l = "";
+     return o.file(t, l), `
+     <w:r>
+       <w:pict>
