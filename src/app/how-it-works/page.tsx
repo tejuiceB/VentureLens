@@ -25,22 +25,22 @@ const steps = [
   },
   { 
     icon: FileScan, 
-    title: "4. Analyze Pitch Decks", 
-    description: "Dive deep by running any pitch deck through our AI analyzer. Get an unbiased report on the business model, market, team, and financials in minutes.",
+    title: "4. Analyze Documents & Ask Questions", 
+    description: "Upload any startup documents (pitch decks, financials, business plans) to get a comprehensive investment memo with key highlights, flashcards for quick learning, and an audio summary. Use the built-in Q&A chatbot to ask specific questions about the documents and get instant, contextual answers based on your analysis.",
     imageUrl: "https://picsum.photos/seed/pitch-deck/600/400",
     imageHint: "presentation chart analysis"
   },
   { 
     icon: BarChart, 
-    title: "5. Review Compliance & Data", 
-    description: "Assess the startup’s regulatory compliance score and review all critical data points in one organized place, from financials to competitive landscape.",
+    title: "5. Generate Compliance Reports", 
+    description: "With one click, generate AI-powered compliance reports tailored to your investment criteria. Get detailed regulatory assessments, risk factors, and jurisdiction-specific compliance scores. Download professional reports in PDF or Word format for your records and due diligence.",
     imageUrl: "https://picsum.photos/seed/compliance-chart/600/400",
     imageHint: "data graph compliance"
   },
   { 
     icon: Handshake, 
-    title: "6. Connect & Invest", 
-    description: "Once you’ve found the right fit, use our platform to securely connect with founders and take the next steps towards investment.",
+    title: "6. Schedule Meetings & Invest", 
+    description: "Schedule meetings with founders directly through our platform. Our smart scheduler generates professional meeting invitations with Google Meet links, automatically including your investment criteria and analysis context. Take the next confident step towards investment with all the information you need.",
     imageUrl: "https://picsum.photos/seed/connect-invest/600/400",
     imageHint: "business meeting handshake"
   },
