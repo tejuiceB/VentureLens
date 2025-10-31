@@ -12,9 +12,9 @@ export interface InvestorProfile {
   involvement: string;
   ethicalConsiderations: string;
   preferredCurrency: string;
-  investmentFocus: string;
-  investmentStage: string;
-  investmentCriteria: string;
+  investmentFocus?: string;
+  investmentStage?: string;
+  investmentCriteria?: string;
   generatedProfile: InvestorRiskAssessmentOutput | null;
 }
 

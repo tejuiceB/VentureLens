@@ -22,8 +22,9 @@ const NotebookLmReportInputSchema = z.object({
   investorCriteria: z
     .string()
     .describe(
-      'The investor’s personalized investment criteria, risk profile, and desired returns.'
+      "The investor's personalized investment criteria, risk profile, and desired returns."
     ),
+  startupName: z.string().optional().describe('The name of the startup being analyzed. If not provided, will be extracted from the documents.'),
   founderInput: z.string().optional().describe('Direct input or answers from the founder.'),
   startupComparison: z.array(z.string()).optional().describe('An optional list of startup names (from the matching tool) to compare the uploaded documents against.'),
 });
@@ -42,6 +43,7 @@ const reportGenerationPrompt = ai.definePrompt({
   output: { schema: NotebookLmReportOutputSchema },
   prompt: `You are an expert investment analyst. Your task is to produce a comprehensive investment memo, an audio summary script, and a set of flashcards based on the provided documents.
 
+{{#if startupName}}**Startup Being Analyzed**: {{{startupName}}}{{/if}}
 **Investor Preferences**: {{{investorCriteria}}}
 **Founder Input (if any)**: {{#if founderInput}}{{{founderInput}}}{{else}}N/A{{/if}}
 **Startup Documents**:
