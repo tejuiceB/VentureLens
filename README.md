@@ -6,7 +6,8 @@
 
 [![Next.js](https://img.shields.io/badge/Next.js-14.2.5-black?style=flat&logo=next.js)](https://nextjs.org/)
 [![Firebase](https://img.shields.io/badge/Firebase-10.12.3-orange?style=flat&logo=firebase)](https://firebase.google.com/)
-[![Genkit](https://img.shields.io/badge/Genkit-1.8.0-blue?style=flat)](https://firebase.google.com/docs/genkit)
+[![Vertex AI](https://img.shields.io/badge/Vertex_AI-Latest-blue?style=flat&logo=google-cloud)](https://cloud.google.com/vertex-ai)
+[![Gemini](https://img.shields.io/badge/Gemini-Pro-blue?style=flat&logo=google)](https://deepmind.google/technologies/gemini/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=flat&logo=typescript)](https://www.typescriptlang.org/)
 
 </div>
@@ -43,11 +44,11 @@ Modern investors face critical challenges when evaluating startup investment opp
 
 ## 🤖 Our Agentic Solution
 
-VentureLens leverages **Google's AI Development Kit (ADK)** and advanced agentic AI to transform investment due diligence into an intelligent, automated workflow:
+VentureLens leverages **Google Agent Development Kit** with **Vertex AI** and **Gemini** to build specialized AI agents that transform investment due diligence into an intelligent, automated workflow:
 
 ### Intelligent AI Agents
 
-Our platform deploys specialized AI agents powered by **Google Gemini** and **Vertex AI** that work collaboratively to:
+Our platform deploys AI agents built using Google's Agent Development Kit, powered by **Vertex AI** and **Gemini Pro**, that work collaboratively to:
 
 #### 1. **Profiler Agent** 🎯
 - Analyzes investor responses using natural language understanding
@@ -102,9 +103,9 @@ Our agents work together through:
 
 | Technology | Version | Purpose |
 |-----------|---------|---------|
-| **Firebase Genkit** | 1.8.0 | AI application development framework with built-in agentic patterns |
-| **Vertex AI** | Latest | Enterprise-grade AI model hosting and fine-tuning |
-| **Google Gemini** | Pro | Multimodal LLM for document analysis and natural language understanding |
+| **Google Agent Development Kit** | Latest | Framework for building intelligent AI agents with orchestration |
+| **Vertex AI** | Latest | Enterprise-grade AI platform for model deployment and management |
+| **Google Gemini** | Pro | Advanced multimodal LLM for document analysis and natural language understanding |
 | **Firebase** | 10.12.3 | Real-time database, authentication, and hosting |
 | **Firebase Admin SDK** | 12.3.0 | Server-side Firebase operations |
 | **Google Cloud Text-to-Speech** | Latest | Audio summary generation |
@@ -124,7 +125,6 @@ Our agents work together through:
 
 | Technology | Purpose |
 |-----------|---------|
-| **Genkit AI Flows** | Structured AI prompt orchestration |
 | **Zod** | Runtime type validation for AI inputs/outputs |
 | **Mammoth** | DOCX document parsing |
 | **XLSX** | Excel spreadsheet processing |
@@ -134,7 +134,6 @@ Our agents work together through:
 
 | Technology | Purpose |
 |-----------|---------|
-| **Genkit CLI** | AI flow development and testing |
 | **ESLint** | Code quality and consistency |
 | **PostCSS** | CSS preprocessing |
 
@@ -201,9 +200,9 @@ Our agents work together through:
              │                          │
              ▼                          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              Firebase Genkit AI Layer                        │
+│         Google Agent Development Kit Layer                   │
 │  ┌─────────────────────────────────────────────────────┐   │
-│  │  AI Agents (Orchestrated Flows)                      │   │
+│  │  Intelligent AI Agents                                │   │
 │  │  • Profiler Agent                                     │   │
 │  │  • Matching Agent                                     │   │
 │  │  • Analyzer Agent                                     │   │
@@ -222,14 +221,14 @@ Our agents work together through:
 └────────────────────────┘   └──────────────────────────────┘
 ```
 
-### AI Flow Architecture
+### Agent Processing Architecture
 
 ```
-User Input → Genkit Flow → Gemini Processing → Structured Output
-     ↓            ↓              ↓                    ↓
-  Validation   Prompting    Vector Search        Type Safety
-     ↓            ↓              ↓                    ↓
-  Error Hand.  Context Mgmt  RAG Pipeline      Format & Store
+User Input → Agent Orchestration → Gemini (Vertex AI) → Structured Output
+     ↓              ↓                      ↓                    ↓
+  Validation    Agent Logic         Vector Search        Type Safety
+     ↓              ↓                      ↓                    ↓
+  Error Hand.   Context Mgmt          RAG Pipeline      Format & Store
 ```
 
 ---
@@ -240,9 +239,9 @@ User Input → Genkit Flow → Gemini Processing → Structured Output
 
 - **Node.js** 20.x or higher
 - **npm** or **yarn** package manager
-- **Firebase project** with Genkit enabled
+- **Firebase project** with authentication and Firestore enabled
 - **Google Cloud account** with Vertex AI API enabled
-- **Gemini API key**
+- **Gemini API key** for AI agent operations
 
 ### Installation
 
@@ -273,10 +272,8 @@ User Input → Genkit Flow → Gemini Processing → Structured Output
    FIREBASE_ADMIN_CLIENT_EMAIL=your_client_email
    FIREBASE_ADMIN_PRIVATE_KEY=your_private_key
 
-   # Google AI
+   # Google AI - Gemini & Vertex AI
    GOOGLE_GENAI_API_KEY=your_gemini_api_key
-   
-   # Vertex AI (Optional for production)
    GOOGLE_CLOUD_PROJECT=your_gcp_project_id
    GOOGLE_CLOUD_LOCATION=us-central1
    ```
@@ -288,13 +285,6 @@ User Input → Genkit Flow → Gemini Processing → Structured Output
    
    Visit [http://localhost:9002](http://localhost:9002)
 
-5. **Run Genkit development UI (Optional)**
-   ```bash
-   npm run genkit:dev
-   ```
-   
-   Visit Genkit UI at [http://localhost:4000](http://localhost:4000)
-
 ### Build for Production
 
 ```bash
@@ -303,16 +293,35 @@ npm start
 ```
 ---
 
-## 🤖 AI Flows
+## 🤖 AI Agents Built with Google ADK
 
-### Flow Catalog
+Our platform uses Google Agent Development Kit to build specialized agents powered by Vertex AI and Gemini:
 
-| Flow | Input | Output | Purpose |
+### Agent Catalog
+
+| Agent | Input | Output | Purpose |
 |------|-------|--------|---------|
-| **investorRiskAssessment** | Questionnaire responses | InvestorProfile | Generate comprehensive risk profile |
-| **personalizedStartupMatching** | InvestorProfile | Startup[] with scores | Match startups to investor criteria |
-| **notebookLmReportGeneration** | Files + Criteria | Investment memo, flashcards, audio script | Comprehensive document analysis |
-| **documentQA** | Question + Documents | Answer + Sources | Conversational Q&A about documents |
-| **generateComplianceReport** | Startup + Criteria | Compliance report | Regulatory assessment |
-| **scheduleMeeting** | Investor + Startup | Meeting details + Calendar link | Smart meeting scheduling |
-| **textToSpeech** | Text script | Audio WAV file | Generate audio summaries |
+| **Profiler Agent** | Questionnaire responses | InvestorProfile | Generate comprehensive risk profile using Gemini analysis |
+| **Matching Agent** | InvestorProfile | Startup[] with scores | Match startups to investor criteria with semantic search |
+| **Analyzer Agent** | Files + Criteria | Investment memo, flashcards, audio script | Comprehensive document analysis via Gemini multimodal |
+| **Q&A Agent** | Question + Documents | Answer + Sources | Conversational Q&A using RAG with Vertex AI embeddings |
+| **Compliance Agent** | Startup + Criteria | Compliance report | Regulatory assessment powered by Gemini reasoning |
+| **Scheduler Agent** | Investor + Startup | Meeting details + Calendar link | Smart meeting scheduling with context generation |
+
+### How Agents Work
+
+Each agent is built using Google's Agent Development Kit (ADK), which provides:
+
+**Core Components:**
+- **Agent Orchestration**: Coordinates multiple agents working together on complex tasks
+- **Vertex AI Integration**: Leverages enterprise-grade AI models for scalable inference
+- **Gemini Pro**: Powers natural language understanding, generation, and multimodal analysis
+- **State Management**: Uses Firebase for real-time agent memory and context persistence
+- **Type Safety**: Zod schemas ensure reliable data flow between agents
+
+**Agent Workflow:**
+1. User input is validated and processed
+2. Agent receives context from previous agents via shared Firebase state
+3. Agent calls Gemini (via Vertex AI) with structured prompts
+4. Response is validated, formatted, and stored
+5. Next agent in chain receives updated context
