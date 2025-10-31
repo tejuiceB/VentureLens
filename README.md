@@ -21,8 +21,6 @@
 - [Architecture](#-architecture)
 - [Getting Started](#-getting-started)
 - [Project Structure](#-project-structure)
-- [AI Flows](#-ai-flows)
-- [Contributing](#-contributing)
 
 ---
 
@@ -318,21 +316,3 @@ npm start
 | **generateComplianceReport** | Startup + Criteria | Compliance report | Regulatory assessment |
 | **scheduleMeeting** | Investor + Startup | Meeting details + Calendar link | Smart meeting scheduling |
 | **textToSpeech** | Text script | Audio WAV file | Generate audio summaries |
-
-### Example Flow Usage
-
-```typescript
-import { generateNotebookLmReport } from '@/ai/flows/notebook-lm-report-generation';
-
-const result = await generateNotebookLmReport({
-  files: [
-    { name: 'pitch.pdf', dataUri: 'data:application/pdf;base64,...' }
-  ],
-  investorCriteria: "Focus on B2B SaaS, Series A, North America",
-  startupName: "TechCorp Inc"
-});
-
-console.log(result.investmentMemo);
-console.log(result.flashcards);
-console.log(result.audioSummary);
-```
