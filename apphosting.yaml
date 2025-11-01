@@ -12,6 +12,10 @@ runConfig:
 
   # Environment variables - Add your secrets in Firebase Console
   # https://console.firebase.google.com/project/agents-473403/apphosting
+  # NOTE: Add these as SECRETS in Firebase Console for sensitive values:
+  # - GEMINI_API_KEY
+  # - GOOGLE_SEARCH_API_KEY
+  # - NEXT_PUBLIC_FIREBASE_API_KEY
   env:
     - variable: GOOGLE_CLOUD_PROJECT_ID
       value: agents-473403
@@ -21,3 +25,15 @@ runConfig:
       value: startup_benchmarks
     - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
       value: agents-473403
+    - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+      value: agents-473403.firebaseapp.com
+    - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+      value: agents-473403.firebasestorage.app
+    - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+      value: "176890074039"
+    - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+      value: 1:176890074039:web:49ff6ef11af57ffdb48e32
+    - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+      value: G-C4QJTR9MLJ
+    - variable: GOOGLE_SEARCH_ENGINE_ID
+      value: c78dd08203ae14ccc
