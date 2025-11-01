@@ -10,19 +10,19 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import * as admin from 'firebase-admin';
+import { getFirebaseAdminCredentials } from '@/lib/service-account';
 
 // Initialize Firebase Admin SDK if not already initialized
 if (!admin.apps.length) {
-  const serviceAccountKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
-  
-  if (serviceAccountKey) {
-    // Parse the service account JSON from environment variable
-    const serviceAccount = JSON.parse(serviceAccountKey);
+  try {
+    // Use inline service account credentials from environment variables
+    const credentials = getFirebaseAdminCredentials();
     admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
+      credential: admin.credential.cert(credentials),
     });
-  } else {
-    // Fallback to default credentials (for local dev or if GOOGLE_APPLICATION_CREDENTIALS is set)
+  } catch (error) {
+    // Fallback to default credentials (for local dev)
+    console.warn('[Firebase Admin] Using default credentials:', error);
     admin.initializeApp();
   }
 }

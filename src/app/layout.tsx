@@ -4,6 +4,12 @@ import { Toaster } from "@/components/ui/toaster";
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import { AuthProvider } from '@/contexts/auth-context';
+import { logEnvironmentStatus } from '@/lib/env-validation';
+
+// Validate environment on startup
+if (typeof window === 'undefined') {
+  logEnvironmentStatus();
+}
 
 export const metadata: Metadata = {
   title: 'VentureLens',

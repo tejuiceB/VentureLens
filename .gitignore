@@ -38,8 +38,29 @@ yarn-error.log*
 next-env.d.ts
 
 .genkit/*
+
+# Environment & Secrets
 .env*
-agents-473403-firebase-adminsdk-fbsvc-bfc0d9a306.json
-# firebase
+!.env.example
+*.json.key
+*-firebase-adminsdk-*.json
+service-account*.json
+
+# BigQuery test data
+*_data.json
+*_seriesc.json
+benchmark*.json
+benchmark*.jsonl
+bigquery_schema.json
+insert_benchmarks.sql
+
+# Firebase
 firebase-debug.log
 firestore-debug.log
+.firebase/*
+
+# Production artifacts
+*.log
+*.pid
+*.seed
+*.pid.lock

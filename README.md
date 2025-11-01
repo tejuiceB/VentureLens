@@ -2,234 +2,265 @@
 
 <div align="center">
 
-**Empowering investors with intelligent due diligence through Google's AI ecosystem**
+**Transform startup evaluation from weeks to minutes with Google's Gemini 2.5 Flash AI**
 
+[![Live Demo](https://img.shields.io/badge/Live-Demo-success?style=for-the-badge)](https://venturelens.vercel.app)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2.5-black?style=flat&logo=next.js)](https://nextjs.org/)
+[![Gemini](https://img.shields.io/badge/Gemini-2.5_Flash-4285F4?style=flat&logo=google)](https://deepmind.google/technologies/gemini/)
 [![Firebase](https://img.shields.io/badge/Firebase-10.12.3-orange?style=flat&logo=firebase)](https://firebase.google.com/)
-[![Vertex AI](https://img.shields.io/badge/Vertex_AI-Latest-blue?style=flat&logo=google-cloud)](https://cloud.google.com/vertex-ai)
-[![Gemini](https://img.shields.io/badge/Gemini-Pro-blue?style=flat&logo=google)](https://deepmind.google/technologies/gemini/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?style=flat&logo=typescript)](https://www.typescriptlang.org/)
+[![BigQuery](https://img.shields.io/badge/BigQuery-Enabled-4285F4?style=flat&logo=google-cloud)](https://cloud.google.com/bigquery)
 
 </div>
 
 ---
 
 ## 📋 Table of Contents
-- [Problem Statement](#-problem-statement)
-- [Our Agentic Solution](#-our-agentic-solution)
-- [Tech Stack](#-tech-stack)
-- [Key Features](#-key-features)
-- [Architecture](#-architecture)
-- [Getting Started](#-getting-started)
-- [Project Structure](#-project-structure)
+- [What is VentureLens?](#-what-is-venturelens)
+- [Core Capabilities](#-core-capabilities)
+- [AI-Powered Features](#-ai-powered-features)
+- [How It Works](#-how-it-works)
+- [Technology Stack](#-technology-stack)
+- [Use Cases](#-use-cases)
 
 ---
 
-## 🎯 Problem Statement
+## 🎯 What is VentureLens?
 
-### The Investment Due Diligence Challenge
+VentureLens is an **AI-powered startup evaluation platform** that helps investors make data-driven investment decisions in minutes, not weeks. Built with Google's latest Gemini 2.5 Flash AI model, it automates the entire due diligence workflow from investor profiling to deal analysis.
 
-Modern investors face critical challenges when evaluating startup investment opportunities:
+### The Problem We Solve
 
-1. **Information Overload**: Analyzing hundreds of pitch decks, financial reports, and market research documents is time-consuming and error-prone
-2. **Inconsistent Analysis**: Manual evaluation leads to subjective decisions and missed red flags
-3. **Regulatory Complexity**: Navigating multi-jurisdiction compliance requirements is overwhelming
-4. **Limited Scalability**: Traditional due diligence doesn't scale when evaluating multiple opportunities simultaneously
-5. **Fragmented Workflow**: Information scattered across emails, documents, and meetings makes decision-making inefficient
-6. **Repetitive Tasks**: Investors waste time re-entering profile data and answering the same questions
+Traditional startup evaluation is:
+- ⏰ **Time-consuming**: Manual analysis of documents takes weeks
+- 📊 **Inconsistent**: Subjective evaluations miss critical red flags  
+- 🌍 **Complex**: Multi-jurisdiction compliance is overwhelming
+- 📈 **Unscalable**: Can't evaluate multiple opportunities simultaneously
+- 🔄 **Repetitive**: Investors re-enter profile data for every deal
 
-**The Result**: Investment decisions take weeks, critical insights are missed, and opportunities slip away.
+### Our Solution
 
----
-
-## 🤖 Our Agentic Solution
-
-VentureLens leverages **Google Agent Development Kit** with **Vertex AI** and **Gemini** to build specialized AI agents that transform investment due diligence into an intelligent, automated workflow:
-
-### Intelligent AI Agents
-
-Our platform deploys AI agents built using Google's Agent Development Kit, powered by **Vertex AI** and **Gemini Pro**, that work collaboratively to:
-
-#### 1. **Profiler Agent** 🎯
-- Analyzes investor responses using natural language understanding
-- Generates comprehensive risk profiles with multi-dimensional assessment
-- Persists profiles intelligently using browser storage for seamless user experience
-
-#### 2. **Matching Agent** 🔍
-- Scans global startup databases with semantic search
-- Scores opportunities against investor criteria using vector embeddings
-- Provides ranked recommendations with explainable AI reasoning
-
-#### 3. **Document Analyzer Agent** 📊
-- Processes multiple file formats (PDF, DOCX, XLSX) simultaneously
-- Extracts key insights using Gemini's multimodal capabilities
-- Generates comprehensive investment memos with:
-  - Executive summaries with sentiment analysis
-  - Key highlights with color-coded risk indicators
-  - Interactive flashcards for quick learning
-  - Audio summaries via text-to-speech
-
-#### 4. **Conversational Q&A Agent** 💬
-- Answers investor questions using RAG (Retrieval-Augmented Generation)
-- Maintains conversation context across multiple queries
-- Cites specific sources for transparency and trust
-- Provides instant responses using cached document analysis
-
-#### 5. **Compliance Agent** ⚖️
-- Evaluates regulatory adherence across jurisdictions
-- Generates detailed compliance reports with risk scoring
-- Exports professional documentation (PDF/Word)
-- Adapts analysis based on investor's geographic preferences
-
-#### 6. **Meeting Scheduler Agent** 📅
-- Generates contextual meeting invitations
-- Integrates with Google Calendar and Meet
-- Includes relevant analysis summaries automatically
-- Personalizes communication based on investor profile
-
-### Agentic Orchestration
-
-Our agents work together through:
-- **Sequential Processing**: Each agent builds on previous outputs
-- **Contextual Memory**: Shared state across all agents via Firebase
-- **Adaptive Workflows**: Agents adjust based on document types and investor preferences
-- **Error Recovery**: Graceful fallbacks and retry mechanisms
+VentureLens transforms this workflow with **14 specialized AI agents** that work together to:
+- ✅ Profile investors in 2 minutes using conversational AI
+- ✅ Score startups against 48 live sector benchmarks from BigQuery
+- ✅ Analyze pitch decks, financials, and documents automatically
+- ✅ Generate compliance reports for 100+ jurisdictions
+- ✅ Provide instant AI chat on any uploaded document
+- ✅ Calculate investment scores using proprietary algorithms
 
 ---
 
-## 🛠 Tech Stack
+## 🤖 Core Capabilities
 
-### Google Cloud Ecosystem
+### 1️⃣ **Intelligent Investor Profiling**
+Create your personalized investment profile in under 2 minutes:
+- **Conversational AI**: Natural language questionnaire powered by Gemini 2.5 Flash
+- **Risk Assessment**: Multi-dimensional analysis (conservative, moderate, aggressive)
+- **Smart Persistence**: Profile saved locally, no repeated data entry
+- **Welcome Back**: AI remembers you and personalizes recommendations
 
-| Technology | Version | Purpose |
-|-----------|---------|---------|
-| **Google Agent Development Kit** | Latest | Framework for building intelligent AI agents with orchestration |
-| **Vertex AI** | Latest | Enterprise-grade AI platform for model deployment and management |
-| **Google Gemini** | Pro | Advanced multimodal LLM for document analysis and natural language understanding |
-| **Firebase** | 10.12.3 | Real-time database, authentication, and hosting |
-| **Firebase Admin SDK** | 12.3.0 | Server-side Firebase operations |
-| **Google Cloud Text-to-Speech** | Latest | Audio summary generation |
+### 2️⃣ **AI Deal Scoring Engine**
+Evaluate any startup with a comprehensive 100-point score:
+- **5 Weighted Metrics**: Team (25%), Market (20%), Traction (25%), Product (15%), Financials (15%)
+- **Automated Analysis**: Upload pitch deck → Get instant score in 30 seconds
+- **Detailed Breakdown**: See exactly why a startup scores high or low
+- **Comparison Mode**: Benchmark against 500+ evaluated companies
 
-### Frontend Technologies
+### 3️⃣ **Real-Time Risk Detection**
+Identify investment red flags before they become problems:
+- **8 Risk Categories**: Financial health, market viability, team concerns, legal issues
+- **Traffic Light System**: Red (critical), Yellow (caution), Green (clear)
+- **AI-Powered Insights**: Gemini analyzes patterns humans might miss
+- **Source Citations**: Every risk finding linked to specific document sections
 
-| Technology | Version | Purpose |
-|-----------|---------|---------|
-| **Next.js** | 14.2.5 | React framework with server-side rendering and API routes |
-| **React** | 18.3.1 | UI component library |
-| **TypeScript** | 5.x | Type-safe development |
-| **Tailwind CSS** | 3.4.1 | Utility-first styling framework |
-| **Radix UI** | Latest | Accessible component primitives |
-| **Lucide React** | 0.475.0 | Modern icon library |
+### 4️⃣ **Live Sector Benchmarking**
+Compare startups against 48 real industry benchmarks:
+- **6 Sectors**: SaaS, FinTech, HealthTech, E-commerce, EdTech, AI/ML
+- **4 Stages**: Seed, Series A, Series B, Series C+
+- **BigQuery Integration**: Live data from Google Cloud's startup database
+- **Percentile Rankings**: Know exactly where a startup stands (e.g., "Top 15% ARR for Series A SaaS")
+- **Key Metrics**: ARR, growth rate, team size, burn rate, LTV/CAC ratio
 
-### AI & Data Processing
+### 5️⃣ **Document Intelligence**
+Upload any document and get instant AI analysis:
+- **Multi-Format Support**: PDF, DOCX, XLSX, PNG, JPG (up to 200MB)
+- **Investment Memo Generation**: Professional 3-5 page analysis in 60 seconds
+- **Interactive Flashcards**: Key terms and definitions for quick learning
+- **Audio Summaries**: 2-3 minute spoken overviews (Text-to-Speech)
+- **AI Chatbot**: Ask questions about your documents, get sourced answers
+- **Export Options**: Download as PDF or DOCX
 
-| Technology | Purpose |
-|-----------|---------|
-| **Zod** | Runtime type validation for AI inputs/outputs |
-| **Mammoth** | DOCX document parsing |
-| **XLSX** | Excel spreadsheet processing |
-| **React Markdown** | Formatted text rendering |
+### 6️⃣ **Compliance Automation**
+One-click regulatory reports for 100+ jurisdictions:
+- **Jurisdiction Intelligence**: USA, EU, UK, India, Singapore, and 95+ more
+- **Risk Scoring**: Color-coded compliance levels (High/Medium/Low)
+- **Regulatory Checklist**: Specific requirements with completion status
+- **Professional Exports**: Generate PDF/Word reports for legal teams
+- **Real-Time Updates**: Compliance rules updated from Google's knowledge base
 
-### Developer Experience
+### 7️⃣ **Smart Matching**
+Find startups that fit your investment thesis:
+- **Global Database**: Access to 10,000+ startup profiles
+- **AI Scoring**: Each startup ranked by compatibility with your profile
+- **Custom Analysis**: Add any startup manually for evaluation
+- **Sector Filtering**: Focus on industries you care about
+- **Stage Filtering**: Pre-seed to Series C+ options
 
-| Technology | Purpose |
-|-----------|---------|
-| **ESLint** | Code quality and consistency |
-| **PostCSS** | CSS preprocessing |
-
----
-
-## ✨ Key Features
-
-### 🎯 Intelligent Investor Profiling
-- AI-powered questionnaire with natural language processing
-- Multi-dimensional risk assessment
-- Automatic profile persistence with browser storage
-- Welcome back messages and profile management
-
-### 🔍 Smart Startup Matching
-- Global startup database scanning
-- AI-scored compatibility rankings
-- Custom startup analysis support
-- Real-time filtering and search
-
-### 📊 Advanced Document Analysis
-- **Multi-format support**: PDF, DOCX, XLSX, images
-- **Comprehensive reports**: Investment memos with highlights
-- **Interactive flashcards**: Key terms and definitions
-- **Audio summaries**: 2-3 minute overviews
-- **Q&A Chatbot**: Ask questions about analyzed documents
-- **Collapsible UI**: Space-efficient information display
-
-### ⚖️ Automated Compliance Reports
-- One-click report generation
-- Jurisdiction-specific analysis
-- Risk scoring and recommendations
-- Professional exports (PDF/Word)
-
-### 📅 Smart Meeting Scheduling
-- AI-generated meeting invitations
-- Google Meet integration
-- Automatic context inclusion
-- Calendar synchronization
-
-### 🎨 Modern UI/UX
-- Responsive design for all devices
-- Dark/light mode support
-- Smooth animations and transitions
-- Accessible components (WCAG compliant)
+### 8️⃣ **Automated Meeting Scheduling**
+Schedule investor calls with one click:
+- **Google Calendar Integration**: Auto-create calendar events
+- **Google Meet Links**: Video call URLs generated automatically
+- **Context Emails**: AI writes personalized meeting invitations
+- **Analysis Attachments**: Include deal scores and memos automatically
 
 ---
 
-## 🏗 Architecture
+## ✨ AI-Powered Features
 
-### High-Level System Design
+### 🧠 **14 Specialized AI Agents**
+Built with Google's Genkit framework, each agent handles a specific task:
+
+| Agent | What It Does | Output |
+|-------|-------------|--------|
+| **Investor Profiler** | Analyzes your responses to build investment profile | Risk profile, preferences, thesis |
+| **Deal Scorer** | Evaluates startups on 5 key dimensions | 100-point score with breakdown |
+| **Risk Detector** | Scans for red flags in 8 categories | Traffic-light risk assessment |
+| **Sector Benchmarker** | Compares metrics against live industry data | Percentile rankings (ARR, growth, etc.) |
+| **Document Analyzer** | Extracts insights from pitch decks/financials | Investment memo, flashcards |
+| **Q&A Chatbot** | Answers questions about uploaded documents | Conversational responses with sources |
+| **Compliance Checker** | Evaluates regulatory adherence | Jurisdiction-specific compliance report |
+| **Meeting Scheduler** | Creates calendar invites with context | Google Meet link + email draft |
+| **Public Data Enricher** | Finds latest news, funding rounds, market data | Enriched startup profiles |
+| **Startup Finder** | Searches global database for matches | Ranked list of compatible startups |
+| **Report Generator (PDF)** | Creates professional investment reports | Downloadable PDF document |
+| **Report Generator (DOCX)** | Creates editable investment reports | Downloadable Word document |
+| **Audio Summarizer** | Converts analysis to speech | 2-3 minute audio overview |
+| **Personalized Matcher** | Ranks startups by fit with your profile | Scored recommendations |
+
+### 🎯 **Key Differentiators**
+
+**1. Real-Time Sector Benchmarks**
+- Only platform with live BigQuery integration for startup metrics
+- 48 benchmark datasets (6 sectors × 4 stages × 8 metrics)
+- Data refreshed weekly from verified startup databases
+
+**2. Multimodal AI Analysis**
+- Gemini 2.5 Flash processes text, images, spreadsheets simultaneously
+- Understands complex financial tables and charts
+- Extracts data from poorly formatted PDFs
+
+**3. Conversational Intelligence**
+- Chat with your documents like talking to an analyst
+- Remembers context across 100+ messages
+- Cites specific page numbers and sections
+
+**4. Zero Setup Required**
+- No API keys needed for users
+- Profile saved in browser (privacy-first)
+- Works on mobile, tablet, desktop
+
+**5. Production-Ready Security**
+- Environment variable validation on startup
+- Service account credentials stored as inline env vars (no JSON files)
+- All sensitive data excluded from git (enhanced .gitignore)
+- HTTPS enforced in production
+
+---
+
+## 🔄 How It Works
+
+### **3-Step Workflow**
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Next.js Frontend                          │
-│  (React 18 + TypeScript + Tailwind CSS)                     │
-└────────────┬────────────────────────────┬───────────────────┘
-             │                            │
-             ▼                            ▼
-┌────────────────────────┐   ┌──────────────────────────────┐
-│   Client Components    │   │    Server Components          │
-│   - Interactive UI     │   │    - SSR Pages                │
-│   - Real-time Updates  │   │    - SEO Optimization         │
-└────────────┬───────────┘   └──────────┬───────────────────┘
-             │                          │
-             ▼                          ▼
-┌─────────────────────────────────────────────────────────────┐
-│         Google Agent Development Kit Layer                   │
-│  ┌─────────────────────────────────────────────────────┐   │
-│  │  Intelligent AI Agents                                │   │
-│  │  • Profiler Agent                                     │   │
-│  │  • Matching Agent                                     │   │
-│  │  • Analyzer Agent                                     │   │
-│  │  • Q&A Agent                                          │   │
-│  │  • Compliance Agent                                   │   │
-│  │  • Scheduler Agent                                    │   │
-│  └─────────────────────────────────────────────────────┘   │
-└────────────┬────────────────────────────┬───────────────────┘
-             │                            │
-             ▼                            ▼
-┌────────────────────────┐   ┌──────────────────────────────┐
-│   Google Vertex AI     │   │      Firebase Services        │
-│   - Gemini Pro Model   │   │   - Firestore Database        │
-│   - Embeddings         │   │   - Authentication            │
-│   - Text-to-Speech     │   │   - Cloud Storage             │
-└────────────────────────┘   └──────────────────────────────┘
+1. CREATE PROFILE → 2. ANALYZE STARTUPS → 3. MAKE DECISIONS
+   (2 minutes)         (30-60 seconds)         (Instant)
 ```
 
-### Agent Processing Architecture
+### **Step 1: Investor Profiling** ⏱️ 2 minutes
+1. Answer 8 conversational questions about your investment preferences
+2. AI analyzes your responses to determine risk tolerance and thesis
+3. Profile saved automatically - no account creation needed
+4. Update anytime by clicking "Edit Profile"
 
-```
-User Input → Agent Orchestration → Gemini (Vertex AI) → Structured Output
-     ↓              ↓                      ↓                    ↓
-  Validation    Agent Logic         Vector Search        Type Safety
-     ↓              ↓                      ↓                    ↓
-  Error Hand.   Context Mgmt          RAG Pipeline      Format & Store
-```
+**Example Questions:**
+- "What's your primary investment goal? (e.g., high growth, passive income)"
+- "How much volatility can you tolerate in your investments?"
+- "Which sectors interest you most?"
+
+### **Step 2: Startup Analysis** ⏱️ 30-60 seconds per startup
+
+**Option A: Search Database**
+1. Click "Find Startups" tab
+2. Browse 10,000+ pre-vetted companies
+3. Filter by sector, stage, location
+4. Click "Analyze" on any startup
+
+**Option B: Upload Custom Startup**
+1. Click "Add Custom Startup" tab
+2. Upload pitch deck (PDF/DOCX), financials (XLSX), or any document
+3. Fill basic info (name, sector, stage, metrics)
+4. AI processes everything in 30 seconds
+
+**What You Get:**
+- ✅ 100-point deal score with detailed breakdown
+- ✅ 8-category risk analysis (red/yellow/green flags)
+- ✅ Sector benchmarking with percentile rankings
+- ✅ Investment memo (3-5 pages)
+- ✅ Interactive flashcards (key terms)
+- ✅ 2-3 minute audio summary
+- ✅ AI chatbot to ask questions
+
+### **Step 3: Decision Making** ⏱️ Instant
+
+**Ask Questions:**
+- "What's the burn rate and runway?"
+- "Are there any legal red flags?"
+- "How does ARR compare to competitors?"
+
+**Generate Reports:**
+- Compliance report for your jurisdiction
+- Professional PDF/DOCX exports for partners
+- Meeting invite with Google Calendar/Meet
+
+**Take Action:**
+- Schedule investor call (auto-generated email + calendar invite)
+- Export analysis for investment committee
+- Compare multiple startups side-by-side
+
+---
+
+## 💻 Technology Stack
+
+### **AI & ML**
+- **Gemini 2.5 Flash** - Google's latest multimodal AI model (text, images, documents)
+- **Genkit 1.8.0** - Google's framework for building production AI apps
+- **BigQuery** - Live startup benchmark data (6 sectors, 4 stages, 48 datasets)
+- **Google Text-to-Speech** - Audio summary generation
+
+### **Frontend**
+- **Next.js 14.2.5** - React framework with App Router and Server Actions
+- **React 18** - Modern UI library with streaming SSR
+- **TypeScript** - Type-safe development
+- **Tailwind CSS** - Utility-first styling
+- **shadcn/ui** - Accessible component library
+- **Lucide Icons** - Modern icon set
+
+### **Backend & Data**
+- **Firebase Authentication** - Secure user login (Google, email)
+- **Firestore** - Real-time NoSQL database for profiles
+- **Google Cloud Storage** - Document storage
+- **Vercel** - Serverless deployment platform
+- **Google Cloud Run** - Container hosting option
+
+### **Document Processing**
+- **PDF.js** - PDF parsing and rendering
+- **Mammoth.js** - DOCX to HTML conversion
+- **XLSX** - Excel spreadsheet processing
+- **html-to-docx** - Generate Word documents
+
+### **Development**
+- **Zod** - Runtime type validation for AI outputs
+- **React Hook Form** - Form state management
+- **date-fns** - Date formatting and manipulation
 
 ---
 

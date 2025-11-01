@@ -11,6 +11,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 import { BigQuery } from '@google-cloud/bigquery';
+import { getBigQueryCredentials } from '@/lib/service-account';
 
 const SectorBenchmarkInputSchema = z.object({
   startupName: z.string().describe("The name of the startup."),
@@ -70,15 +71,41 @@ async function getBigQueryBenchmarks(sector: string, stage: string) {
     const datasetId = process.env.BIGQUERY_DATASET_ID || 'startup_benchmarks';
 
     if (!projectId) {
-      console.warn('BigQuery not configured. Using mock benchmark data.');
-      return getMockBenchmarkData(sector, stage);
+      throw new Error('GOOGLE_CLOUD_PROJECT_ID environment variable not set');
     }
 
-    const bigquery = new BigQuery({ projectId });
+    // Construct service account credentials from environment variables
+    const serviceAccountEmail = process.env.GCP_SERVICE_ACCOUNT_CLIENT_EMAIL;
+    const privateKey = process.env.GCP_SERVICE_ACCOUNT_PRIVATE_KEY;
+    
+    if (!serviceAccountEmail || !privateKey) {
+      throw new Error('GCP service account credentials not set. Required: GCP_SERVICE_ACCOUNT_CLIENT_EMAIL and GCP_SERVICE_ACCOUNT_PRIVATE_KEY');
+    }
 
-    // Sanitize inputs to prevent SQL injection
+    console.log(`[BigQuery] Initializing with project: ${projectId}, service account: ${serviceAccountEmail}`);
+    
+    const bigquery = new BigQuery({ 
+      projectId,
+      credentials: {
+        client_email: serviceAccountEmail,
+        private_key: privateKey.replace(/\\n/g, '\n'), // Handle escaped newlines
+      },
+    });
+
+    // Sanitize sector name for table name (only alphanumeric and underscore)
     const safeSector = sector.replace(/[^a-zA-Z0-9_]/g, '');
-    const safeStage = stage.replace(/[^a-zA-Z0-9_]/g, '');
+    
+    // Map sector names to table names
+    const sectorTableMap: Record<string, string> = {
+      'SaaS': 'saas',
+      'FinTech': 'fintech',
+      'HealthTech': 'healthtech',
+      'E-commerce': 'ecommerce',
+      'EdTech': 'edtech',
+      'AI/ML': 'aiml',
+    };
+    
+    const tableName = sectorTableMap[sector] || safeSector.toLowerCase();
 
     const query = `
       SELECT 
@@ -92,130 +119,43 @@ async function getBigQueryBenchmarks(sector: string, stage: string) {
         AVG(cac) as avg_cac,
         AVG(ltv) as avg_ltv,
         AVG(ltv / NULLIF(cac, 0)) as avg_ltv_cac_ratio
-      FROM \`${projectId}.${datasetId}.${safeSector.toLowerCase()}\`
+      FROM \`${projectId}.${datasetId}.${tableName}\`
       WHERE stage = @stage
       LIMIT 1
     `;
 
     const options = {
       query: query,
-      params: { stage: safeStage },
+      params: { stage: stage }, // Use original stage value with + symbol
     };
 
+    console.log(`[BigQuery] Querying table: ${projectId}.${datasetId}.${tableName}, stage: "${stage}"`);
+    
     const [rows] = await bigquery.query(options);
 
+    console.log(`[BigQuery] Query returned ${rows.length} rows`);
+    if (rows.length > 0) {
+      console.log('[BigQuery] Sample data:', rows[0]);
+    }
+
     if (rows && rows.length > 0) {
+      // Check if we got actual data or just nulls
+      const hasData = rows[0].avg_arr !== null || rows[0].median_arr !== null;
+      if (!hasData) {
+        throw new Error(`BigQuery returned null values for ${sector} / ${stage}. No matching data in table.`);
+      }
       return rows[0];
     } else {
-      console.warn(`No benchmark data found for ${sector} / ${stage}. Using mock data.`);
-      return getMockBenchmarkData(sector, stage);
+      throw new Error(`No benchmark data found in BigQuery for ${sector} / ${stage}.`);
     }
   } catch (error: any) {
-    console.error('BigQuery error:', error.message);
-    return getMockBenchmarkData(sector, stage);
+    console.error('[BigQuery ERROR]:', error.message);
+    // CRITICAL: Don't use mock data - throw error so user knows BigQuery failed
+    throw new Error(`BigQuery query failed: ${error.message}. Please check service account permissions and table data.`);
   }
 }
 
-/**
- * Mock benchmark data for demonstration
- */
-function getMockBenchmarkData(sector: string, stage: string) {
-  const benchmarks: Record<string, any> = {
-    'SaaS': {
-      'Seed': {
-        avg_arr: 200000,
-        median_arr: 150000,
-        top_quartile_arr: 400000,
-        avg_growth_rate: 150,
-        median_growth_rate: 120,
-        avg_burn_rate: 80000,
-        avg_team_size: 8,
-        avg_cac: 1200,
-        avg_ltv: 6000,
-        avg_ltv_cac_ratio: 5,
-      },
-      'Series A': {
-        avg_arr: 2000000,
-        median_arr: 1500000,
-        top_quartile_arr: 3500000,
-        avg_growth_rate: 200,
-        median_growth_rate: 180,
-        avg_burn_rate: 250000,
-        avg_team_size: 25,
-        avg_cac: 2000,
-        avg_ltv: 12000,
-        avg_ltv_cac_ratio: 6,
-      },
-      'Series B': {
-        avg_arr: 10000000,
-        median_arr: 8000000,
-        top_quartile_arr: 15000000,
-        avg_growth_rate: 150,
-        median_growth_rate: 120,
-        avg_burn_rate: 800000,
-        avg_team_size: 75,
-        avg_cac: 3500,
-        avg_ltv: 20000,
-        avg_ltv_cac_ratio: 5.7,
-      },
-    },
-    'FinTech': {
-      'Seed': {
-        avg_arr: 300000,
-        median_arr: 250000,
-        top_quartile_arr: 500000,
-        avg_growth_rate: 180,
-        median_growth_rate: 150,
-        avg_burn_rate: 100000,
-        avg_team_size: 10,
-        avg_cac: 800,
-        avg_ltv: 5000,
-        avg_ltv_cac_ratio: 6.25,
-      },
-      'Series A': {
-        avg_arr: 2500000,
-        median_arr: 2000000,
-        top_quartile_arr: 4000000,
-        avg_growth_rate: 220,
-        median_growth_rate: 200,
-        avg_burn_rate: 300000,
-        avg_team_size: 30,
-        avg_cac: 1500,
-        avg_ltv: 10000,
-        avg_ltv_cac_ratio: 6.67,
-      },
-    },
-    'HealthTech': {
-      'Seed': {
-        avg_arr: 250000,
-        median_arr: 200000,
-        top_quartile_arr: 450000,
-        avg_growth_rate: 120,
-        median_growth_rate: 100,
-        avg_burn_rate: 90000,
-        avg_team_size: 12,
-        avg_cac: 2500,
-        avg_ltv: 15000,
-        avg_ltv_cac_ratio: 6,
-      },
-      'Series A': {
-        avg_arr: 1800000,
-        median_arr: 1500000,
-        top_quartile_arr: 3000000,
-        avg_growth_rate: 150,
-        median_growth_rate: 130,
-        avg_burn_rate: 280000,
-        avg_team_size: 35,
-        avg_cac: 3000,
-        avg_ltv: 18000,
-        avg_ltv_cac_ratio: 6,
-      },
-    },
-  };
-
-  const sectorData = benchmarks[sector] || benchmarks['SaaS'];
-  return sectorData[stage] || sectorData['Series A'];
-}
+// Mock data removed - using real BigQuery data only
 
 export async function benchmarkStartup(
   input: SectorBenchmarkInput
@@ -266,6 +206,39 @@ const sectorBenchmarkingFlow = ai.defineFlow(
       if (benchmarks.avgLTV) benchmarksText += `- Average LTV: $${benchmarks.avgLTV.toLocaleString()}\n`;
       if (benchmarks.avgLTVCACRatio) benchmarksText += `- Average LTV:CAC Ratio: ${benchmarks.avgLTVCACRatio.toFixed(1)}x\n`;
 
+      // Calculate percentiles based on comparison to benchmarks
+      const calculatePercentile = (value: number | undefined, avg: number | undefined, median: number | undefined): number => {
+        if (!value || !avg) return 0;
+        
+        // Use normal distribution approximation
+        // If value equals average, percentile is 50
+        // If value is 2x average, percentile is ~97.5
+        // If value is 0.5x average, percentile is ~2.5
+        
+        const ratio = value / avg;
+        
+        if (ratio >= 2) return 98;
+        if (ratio >= 1.5) return 85;
+        if (ratio >= 1.2) return 70;
+        if (ratio >= 1.0) return 50;
+        if (ratio >= 0.8) return 30;
+        if (ratio >= 0.5) return 15;
+        return 5;
+      };
+
+      const arrPercentile = calculatePercentile(input.metrics.arr, benchmarks.avgARR, benchmarks.medianARR);
+      const growthPercentile = calculatePercentile(input.metrics.growthRate, benchmarks.avgGrowthRate, undefined);
+      
+      // For LTV:CAC efficiency
+      const startupLTVCAC = (input.metrics.ltv && input.metrics.cac && input.metrics.cac > 0) 
+        ? input.metrics.ltv / input.metrics.cac 
+        : undefined;
+      const efficiencyPercentile = calculatePercentile(startupLTVCAC, benchmarks.avgLTVCACRatio, undefined);
+      
+      const teamSizePercentile = calculatePercentile(input.metrics.teamSize, benchmarks.avgTeamSize, undefined);
+
+      console.log('[Percentiles Calculated]:', { arrPercentile, growthPercentile, efficiencyPercentile, teamSizePercentile });
+
       const analysisPrompt = `You are an AI analyst comparing a startup's metrics against sector benchmarks.
 
 **Startup:** ${input.startupName}
@@ -276,20 +249,26 @@ ${metricsText}
 
 ${benchmarksText}
 
-**Instructions:**
-1. Calculate percentile rankings for each metric (0 = worst, 100 = best)
-2. Identify strengths (metrics above sector average)
-3. Identify weaknesses (metrics below sector average)
-4. Flag outliers (metrics >2x or <0.5x sector average)
-5. Determine overall verdict:
-   - Exceptional: Top 10% across multiple metrics
-   - Above Average: Better than average in most metrics
-   - Average: Mixed performance, close to benchmarks
-   - Below Average: Underperforming in most metrics
-   - Concerning: Significantly below benchmarks with red flags
-6. Write a 2-3 paragraph summary with actionable insights
+**Calculated Percentile Rankings:**
+- ARR Percentile: ${arrPercentile}th (${input.metrics.arr ? `$${input.metrics.arr.toLocaleString()}` : 'N/A'} vs avg $${benchmarks.avgARR?.toLocaleString() || 'N/A'})
+- Growth Percentile: ${growthPercentile}th (${input.metrics.growthRate || 'N/A'}% vs avg ${benchmarks.avgGrowthRate || 'N/A'}%)
+- Efficiency Percentile: ${efficiencyPercentile}th (${startupLTVCAC?.toFixed(1) || 'N/A'}x vs avg ${benchmarks.avgLTVCACRatio?.toFixed(1) || 'N/A'}x LTV:CAC)
+- Team Size Percentile: ${teamSizePercentile}th (${input.metrics.teamSize || 'N/A'} vs avg ${benchmarks.avgTeamSize?.toFixed(0) || 'N/A'})
 
-Be specific with numbers and provide investor-ready analysis.`;
+**Instructions:**
+1. Use the CALCULATED percentile rankings above (do NOT recalculate them)
+2. Identify strengths (percentiles >60) and weaknesses (percentiles <40)
+3. Flag outliers (metrics >2x or <0.5x sector average)
+4. Determine overall verdict:
+   - Exceptional: Top 20% (percentiles >80) across multiple metrics
+   - Above Average: Above average (percentiles 60-80) in most metrics
+   - Average: Mixed performance (percentiles 40-60)
+   - Below Average: Underperforming (percentiles 20-40) in most metrics
+   - Concerning: Significantly below (percentiles <20) benchmarks with red flags
+5. Write a 2-3 paragraph summary with SPECIFIC, ACTIONABLE insights for investors
+6. Focus on what the startup needs to DO to improve weak areas
+
+Be direct, quantitative, and investor-focused. Reference specific numbers from the data.`;
 
       // Use Gemini to analyze and compare
       const { output } = await ai.generate({
@@ -302,10 +281,18 @@ Be specific with numbers and provide investor-ready analysis.`;
         throw new Error("AI model returned null response during benchmarking.");
       }
 
-      // Add benchmark data to output
+      // Override with our calculated percentiles (don't trust AI's calculations)
       return {
-        ...output,
         benchmarkData: benchmarks,
+        percentileRankings: {
+          arrPercentile,
+          growthPercentile,
+          efficiencyPercentile,
+          teamSizePercentile,
+        },
+        comparison: output.comparison,
+        verdict: output.verdict,
+        summary: output.summary,
       };
     } catch (error: any) {
       console.error("Error in sectorBenchmarkingFlow:", error);

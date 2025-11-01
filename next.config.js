@@ -6,6 +6,7 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  output: 'standalone', // Enable standalone output for Docker
   images: {
     remotePatterns: [
       {

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { UserCheck, Target, FileScan, TrendingUp, Database, Handshake } from 'lucide-react';
+import { UserCheck, Target, FileScan, ShieldCheck, Handshake } from 'lucide-react';
 
 const featureDetails = [
   {
@@ -17,25 +17,18 @@ const featureDetails = [
     imageHint: 'target dartboard',
   },
   {
-    icon: Database,
-    title: 'AI Deal Analysis with Public Data Enrichment',
-    description: 'Enter basic startup information and watch our AI automatically enrich it with real-time data from Crunchbase and other public sources. Get comprehensive insights including funding history, team size, revenue estimates, and market positioning—all without manual research.',
-    imageUrl: 'https://picsum.photos/seed/data-enrichment/600/400',
-    imageHint: 'database network connections',
-  },
-  {
-    icon: TrendingUp,
-    title: 'Real-Time Sector Benchmarking',
-    description: 'Compare any startup against industry peers using our BigQuery-powered benchmarking engine. Get percentile rankings for ARR, growth rate, burn rate, team efficiency, and unit economics. Identify strengths, weaknesses, and outliers with data-driven sector comparisons across all funding stages from Seed to Series C+.',
-    imageUrl: 'https://picsum.photos/seed/sector-benchmark/600/400',
-    imageHint: 'growth chart comparison',
-  },
-  {
     icon: FileScan,
     title: 'Document Analyzer with AI Chatbot',
     description: 'Upload any startup documents (pitch decks, financials, business plans) and receive an instant, comprehensive investment memo with key highlights, flashcards, and audio summaries. Plus, ask questions via our intelligent Q&A chatbot that answers based on your analyzed documents. Analyze both matched startups and custom companies with multiple file support.',
     imageUrl: 'https://picsum.photos/seed/deck-analyzer/600/400',
     imageHint: 'document data analysis',
+  },
+   {
+    icon: ShieldCheck,
+    title: 'AI-Powered Compliance Reports',
+    description: 'Generate comprehensive regulatory compliance reports for any startup with a single click. Our AI analyzes documents against your investment criteria and local regulations, providing detailed compliance assessments, risk factors, and regulatory considerations. Download professional reports in PDF or Word format for your records.',
+    imageUrl: 'https://picsum.photos/seed/gavel-compliance/600/400',
+    imageHint: 'gavel justice scales',
   },
   {
     icon: Handshake,
