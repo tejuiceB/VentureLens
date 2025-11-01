@@ -228,6 +228,274 @@ Built with Google's Genkit framework, each agent handles a specific task:
 
 ---
 
+## 🏗️ Architecture Diagram
+
+### **System Architecture Overview**
+
+The main parts of VentureLens work together in three layers: **Frontend (what users see)**, **AI Processing (the smart analysis)**, and **Data Storage (where information lives)**. Here's how they communicate:
+
+```mermaid
+graph TB
+    subgraph "👤 User Interface Layer"
+        A[🌐 Web Browser<br/>Works on Phone/Tablet/Desktop]
+        A1[⚛️ Next.js Frontend<br/>React Components + TypeScript]
+        A2[🎨 UI Components<br/>Tailwind + shadcn/ui]
+    end
+
+    subgraph "🚀 Edge Delivery Network"
+        B[☁️ Vercel Global CDN<br/>Fast Worldwide Access]
+        B1[⚡ Serverless Functions<br/>No Server Management Needed]
+    end
+
+    subgraph "🧠 AI Processing Engine"
+        C[🔧 Next.js Server<br/>Secure Backend Logic]
+        C1[🤖 Genkit Framework<br/>AI Orchestration Layer]
+        C2[📄 Document Parser<br/>Reads PDF/Word/Excel]
+    end
+
+    subgraph "🎯 Google AI Services"
+        D1[✨ Gemini 2.5 Flash<br/>Main Intelligence]
+        D2[🔊 Gemini TTS<br/>Audio Generation]
+        D3[🔍 Google Search API<br/>Public Data Finder]
+        D4[💬 Natural Language API<br/>Sentiment Analysis]
+    end
+
+    subgraph "💾 Data Storage Layer"
+        E1[🔐 Firebase Auth<br/>User Login System]
+        E2[📊 Firestore<br/>Profile Database]
+        E3[📈 BigQuery<br/>Benchmark Data<br/>150+ Startups]
+        E4[☁️ Cloud Storage<br/>Document Files]
+    end
+
+    subgraph "🔗 External Tools"
+        F1[📅 Google Calendar<br/>Meeting Scheduler]
+        F2[📹 Google Meet<br/>Video Calls]
+        F3[📧 Gmail API<br/>Email Sender]
+    end
+
+    subgraph "💻 Browser Storage"
+        G[💾 localStorage<br/>Quick Profile Save]
+    end
+
+    A -->|User Opens App| B
+    B -->|Serves Website| A1
+    A1 -->|Displays| A2
+    B1 -->|API Calls| C
+    C -->|Coordinates| C1
+    C -->|Processes Files| C2
+    
+    C1 -->|Analyzes Documents| D1
+    C1 -->|Generates Audio| D2
+    C1 -->|Searches Web| D3
+    C1 -->|Checks Sentiment| D4
+    
+    C -->|Authenticates| E1
+    C -->|Saves Profiles| E2
+    C -->|Queries Benchmarks| E3
+    C -->|Stores Documents| E4
+    
+    C -->|Creates Events| F1
+    C -->|Generates Links| F2
+    C -->|Sends Emails| F3
+    
+    A1 -->|Caches Profile| G
+    G -->|Loads Profile| A1
+
+    D1 -.->|Returns Analysis| C1
+    D2 -.->|Returns Audio| C1
+    D3 -.->|Returns Results| C1
+    D4 -.->|Returns Score| C1
+    
+    E2 -.->|Syncs Data| C
+    E3 -.->|Returns Metrics| C
+    
+    C1 -.->|Sends Results| A1
+    A1 -.->|Updates Display| A2
+
+    style D1 fill:#4285F4,stroke:#1a73e8,stroke-width:3px,color:#fff
+    style D2 fill:#4285F4,stroke:#1a73e8,stroke-width:3px,color:#fff
+    style D3 fill:#4285F4,stroke:#1a73e8,stroke-width:3px,color:#fff
+    style D4 fill:#4285F4,stroke:#1a73e8,stroke-width:3px,color:#fff
+    style E3 fill:#669DF6,stroke:#1a73e8,stroke-width:3px,color:#fff
+    style C1 fill:#34A853,stroke:#0f9d58,stroke-width:3px,color:#fff
+    style B fill:#FBBC04,stroke:#f29900,stroke-width:2px
+    style G fill:#EA4335,stroke:#d93025,stroke-width:2px,color:#fff
+```
+
+**How They Talk:**
+1. **User → Frontend**: You click buttons and upload files in your browser
+2. **Frontend → Edge Network**: Vercel delivers the website super fast from servers near you
+3. **Frontend → Backend**: When you need AI analysis, it talks to secure Next.js server
+4. **Backend → Genkit**: Server asks Genkit framework to coordinate the AI work
+5. **Genkit → Gemini AI**: Gemini analyzes documents, generates text, creates audio
+6. **Genkit → BigQuery**: Fetches live benchmark data (how startups compare)
+7. **Genkit → Search API**: Finds latest news and public information about startups
+8. **Backend → Firebase**: Saves your profile so it's there next time
+9. **Backend → localStorage**: Also saves locally for instant loading
+10. **Gemini → Frontend**: Analysis results flow back to your screen in real-time
+
+### **User Journey Flow** (What Happens When You Use VentureLens)
+
+This diagram shows the complete journey from "I'm an investor" to "I made a decision":
+
+```mermaid
+flowchart TD
+    Start([👤 Investor Opens VentureLens]) --> Profile{Has Profile?}
+    
+    Profile -->|No| Q1[📝 Fill Questionnaire<br/>8 Questions, 2 Minutes]
+    Profile -->|Yes| Welcome[👋 Welcome Back Message<br/>Profile Auto-Loaded]
+    
+    Q1 --> AI1[🤖 Gemini Analyzes Answers]
+    AI1 --> Save1[💾 Save to Firebase + localStorage]
+    Save1 --> Welcome
+    
+    Welcome --> Match[🎯 AI Finds Matching Startups<br/>From 10,000+ Database]
+    Match --> List[📋 Display Ranked List<br/>Best Fits First]
+    
+    List --> Choice{Choose Action}
+    
+    Choice -->|Select Startup| QuickAnalysis[⚡ Quick Analysis<br/>30 Seconds]
+    Choice -->|Upload Custom| Upload[📤 Upload Pitch Deck<br/>PDF/Word/Excel]
+    
+    Upload --> Parse[📄 Parse Documents]
+    Parse --> QuickAnalysis
+    
+    QuickAnalysis --> Parallel[🔄 Run 4 AI Flows in Parallel]
+    
+    Parallel --> Flow1[🔍 Public Data<br/>Google Search News]
+    Parallel --> Flow2[📊 Benchmarking<br/>Query BigQuery]
+    Parallel --> Flow3[⚠️ Risk Detection<br/>Gemini Analysis]
+    Parallel --> Flow4[🎯 Deal Scoring<br/>100-Point Score]
+    
+    Flow1 --> Merge[🔄 Combine Results]
+    Flow2 --> Merge
+    Flow3 --> Merge
+    Flow4 --> Merge
+    
+    Merge --> Display[📱 Display Dashboard<br/>Score + Risks + Charts]
+    
+    Display --> Interact{What Next?}
+    
+    Interact -->|Generate Memo| Memo[📝 Investment Memo<br/>3-5 Pages]
+    Interact -->|Ask Questions| Chat[💬 AI Chatbot<br/>Q&A on Documents]
+    Interact -->|Get Audio| Audio[🔊 Audio Summary<br/>2-3 Minutes]
+    Interact -->|Check Compliance| Compliance[✅ Compliance Report<br/>Your Jurisdiction]
+    Interact -->|Schedule Call| Meeting[📅 Google Meet Link<br/>Auto Email]
+    
+    Memo --> Export[⬇️ Download PDF/Word]
+    Chat --> MoreQ{More Questions?}
+    MoreQ -->|Yes| Chat
+    MoreQ -->|No| Decision
+    
+    Audio --> Listen[🎧 Listen On-the-Go]
+    Compliance --> Review[📋 Review Regulations]
+    Meeting --> Calendar[📆 Added to Calendar]
+    
+    Export --> Decision[✅ Make Investment Decision]
+    Listen --> Decision
+    Review --> Decision
+    Calendar --> Decision
+    
+    Decision --> End([🎉 Done! 25 Minutes Total])
+    
+    style Start fill:#4285F4,stroke:#1a73e8,stroke-width:3px,color:#fff
+    style AI1 fill:#34A853,stroke:#0f9d58,stroke-width:2px,color:#fff
+    style Parallel fill:#FBBC04,stroke:#f29900,stroke-width:2px
+    style Display fill:#EA4335,stroke:#d93025,stroke-width:2px,color:#fff
+    style End fill:#4285F4,stroke:#1a73e8,stroke-width:3px,color:#fff
+```
+
+**Step-by-Step Breakdown:**
+
+1. **Profile Creation** (2 min): Answer 8 questions → Gemini analyzes → Profile saved
+2. **Startup Matching** (1 min): AI searches database → Returns best fits for you
+3. **Quick Analysis** (30 sec): Enter startup OR upload docs → AI processes everything
+4. **Parallel Processing**: Four AI agents work simultaneously:
+   - 🔍 **Public Data Enricher**: Searches Google for news, funding, competitors
+   - 📊 **Sector Benchmarker**: Queries BigQuery for industry comparisons
+   - ⚠️ **Risk Detector**: Scans for red flags in 8 categories
+   - 🎯 **Deal Scorer**: Calculates 100-point score (team, market, traction, product, financials)
+5. **Interactive Dashboard** (10 min): Explore results, ask questions, generate reports
+6. **Take Action** (2 min): Download reports, schedule meetings, make decisions
+
+**Total Time**: 15-25 minutes from "Who are you?" to "Here's my investment decision"
+
+### **AI Agents Working Together** (12 Specialized Agents)
+
+Each agent is a focused AI flow built with Genkit + Gemini that handles one specific task:
+
+```mermaid
+graph LR
+    subgraph "🎯 Core Analysis Agents"
+        A1[👤 Investor Profiler<br/>Risk Assessment]
+        A2[🎯 Deal Scorer<br/>100-Point Rating]
+        A3[⚠️ Risk Detector<br/>Red Flag Finder]
+        A4[📊 Benchmarker<br/>Sector Comparison]
+    end
+    
+    subgraph "📄 Document Agents"
+        D1[📝 Memo Generator<br/>Investment Analysis]
+        D2[💬 Q&A Chatbot<br/>Document Questions]
+        D3[🔊 Audio Creator<br/>Text-to-Speech]
+        D4[📥 Report Exporter<br/>PDF/DOCX]
+    end
+    
+    subgraph "🔍 Research Agents"
+        R1[🌐 Data Enricher<br/>Google Search]
+        R2[🎯 Startup Finder<br/>Database Search]
+        R3[✅ Compliance Checker<br/>Regulations]
+    end
+    
+    subgraph "📅 Action Agents"
+        M1[📧 Meeting Scheduler<br/>Calendar + Email]
+    end
+    
+    User[👤 User Input] --> A1
+    User --> R2
+    User --> D1
+    
+    A1 --> R2
+    R2 --> A2
+    A2 --> A3
+    A3 --> A4
+    
+    A4 --> D1
+    D1 --> D2
+    D1 --> D3
+    D1 --> D4
+    
+    R1 --> A3
+    R1 --> A4
+    
+    D1 --> R3
+    R3 --> M1
+    
+    M1 --> Result[✅ Investment<br/>Decision]
+    D4 --> Result
+
+    style A2 fill:#4285F4,stroke:#1a73e8,stroke-width:3px,color:#fff
+    style D1 fill:#34A853,stroke:#0f9d58,stroke-width:2px,color:#fff
+    style R1 fill:#FBBC04,stroke:#f29900,stroke-width:2px
+    style M1 fill:#EA4335,stroke:#d93025,stroke-width:2px,color:#fff
+```
+
+**How They Work Together:**
+
+1. **Profiler** analyzes your investment style → tells **Finder** what to look for
+2. **Finder** searches database → sends startups to **Scorer**
+3. **Scorer** evaluates startup → triggers **Risk Detector** and **Benchmarker** in parallel
+4. **Data Enricher** searches Google → feeds findings to **Risk Detector**
+5. **Benchmarker** queries BigQuery → adds percentile rankings to **Scorer**
+6. **Memo Generator** combines all insights → creates comprehensive analysis
+7. **Q&A Chatbot** uses memo + documents → answers your questions
+8. **Audio Creator** reads memo → generates 2-3 min summary
+9. **Compliance Checker** analyzes memo + location → regulatory report
+10. **Meeting Scheduler** uses analysis → creates calendar invite
+11. **Report Exporter** formats everything → downloadable PDF/Word
+12. **All agents** coordinate through **Genkit** framework → powered by **Gemini 2.5 Flash**
+
+---
+
 ## 💻 Technology Stack
 
 ### **AI & ML**
