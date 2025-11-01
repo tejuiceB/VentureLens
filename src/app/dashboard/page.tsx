@@ -253,28 +253,8 @@ export default function DashboardPage() {
   
   const handleFiles = (files: FileList) => {
     const newFiles = Array.from(files);
-    
-    // Validate file sizes before adding
-    const MAX_SINGLE_FILE = 50 * 1024 * 1024; // 50MB per file
-    const oversizedFiles = newFiles.filter(f => f.size > MAX_SINGLE_FILE);
-    
-    if (oversizedFiles.length > 0) {
-      setAnalyzerError(`Files too large: ${oversizedFiles.map(f => `${f.name} (${(f.size / 1024 / 1024).toFixed(2)}MB)`).join(', ')}. Max 50MB per file.`);
-      return;
-    }
-    
     setUploadedFiles(prev => {
         const updatedFiles = [...prev, ...newFiles];
-        
-        // Check total size after adding
-        const totalSize = updatedFiles.reduce((sum, file) => sum + file.size, 0);
-        const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100MB total
-        
-        if (totalSize > MAX_TOTAL_SIZE) {
-          setAnalyzerError(`Total file size would exceed 100MB limit. Current: ${(totalSize / 1024 / 1024).toFixed(2)}MB`);
-          return prev; // Don't add the files
-        }
-        
         // Reset subsequent steps whenever files change
         setAnalysisResult(null); 
         setAnalyzerError(null);
@@ -310,23 +290,6 @@ export default function DashboardPage() {
     }
     if (!customStartupName.trim()) {
       setAnalyzerError("Please enter the startup name you're analyzing.");
-      return;
-    }
-
-    // Check total file size limit (100MB total)
-    const MAX_TOTAL_SIZE = 100 * 1024 * 1024; // 100MB in bytes
-    const MAX_SINGLE_FILE = 50 * 1024 * 1024; // 50MB per file
-    const totalSize = uploadedFiles.reduce((sum, file) => sum + file.size, 0);
-    
-    if (totalSize > MAX_TOTAL_SIZE) {
-      setAnalyzerError(`Total file size (${(totalSize / 1024 / 1024).toFixed(2)}MB) exceeds 100MB limit. Please remove some files.`);
-      return;
-    }
-
-    // Check individual file sizes
-    const oversizedFiles = uploadedFiles.filter(f => f.size > MAX_SINGLE_FILE);
-    if (oversizedFiles.length > 0) {
-      setAnalyzerError(`Files too large: ${oversizedFiles.map(f => `${f.name} (${(f.size / 1024 / 1024).toFixed(2)}MB)`).join(', ')}. Max 50MB per file.`);
       return;
     }
 
@@ -406,26 +369,12 @@ export default function DashboardPage() {
           startupComparison: selectedStartupsForAnalysis 
       };
       
-      console.log(`Sending ${files.length} files to analysis, total size: ${JSON.stringify(input).length} bytes`);
-      
       const result = await generateNotebookLmReport(input);
       setAnalysisResult(result);
 
     } catch (err: any) {
       console.error("Error analyzing files:", err);
-      
-      // Provide user-friendly error messages
-      let errorMessage = err.message || "An unexpected error occurred during analysis.";
-      
-      if (err.message?.includes('413') || err.message?.includes('Content Too Large') || err.message?.includes('body size')) {
-        errorMessage = "File size too large for processing. Please try with smaller files (under 50MB total) or fewer documents.";
-      } else if (err.message?.includes('timeout') || err.message?.includes('timed out')) {
-        errorMessage = "Analysis timed out. Please try with fewer or smaller files.";
-      } else if (err.message?.includes('Server Components')) {
-        errorMessage = "Server error during analysis. This may be due to file size or complexity. Try with smaller files or contact support.";
-      }
-      
-      setAnalyzerError(errorMessage);
+      setAnalyzerError(err.message || "An unexpected error occurred during analysis.");
     } finally {
       setIsAnalyzing(false);
     }
@@ -746,19 +695,7 @@ export default function DashboardPage() {
 
     } catch (err: any) {
       console.error("Error running deal analysis:", err);
-      
-      // Provide user-friendly error messages
-      let errorMessage = err.message || "An unexpected error occurred during analysis.";
-      
-      if (err.message?.includes('413') || err.message?.includes('Content Too Large')) {
-        errorMessage = "Request too large. Please try with less data or contact support.";
-      } else if (err.message?.includes('timeout')) {
-        errorMessage = "Analysis timed out. Please try again.";
-      } else if (err.message?.includes('Server Components') || err.message?.includes('digest')) {
-        errorMessage = "Server error during analysis. Please try again or contact support if the issue persists.";
-      }
-      
-      setDealAnalysisError(errorMessage);
+      setDealAnalysisError(err.message || "An unexpected error occurred during analysis.");
       setDealAnalysisProgress("");
     } finally {
       setIsRunningDealAnalysis(false);
@@ -1446,7 +1383,7 @@ export default function DashboardPage() {
                   <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       <FileUp className="w-10 h-10 mb-3 text-muted-foreground" />
                       <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                      <p className="text-xs text-muted-foreground">PDF, TXT, EML, DOCX, XLSX (Max 50MB per file, 100MB total)</p>
+                      <p className="text-xs text-muted-foreground">PDF, TXT, EML, DOCX, XLSX</p>
                   </div>
                 </Label>
                 {dragActive && <div className="absolute inset-0" onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}></div>}
@@ -1454,21 +1391,11 @@ export default function DashboardPage() {
 
               {uploadedFiles.length > 0 && (
                 <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <h3 className="font-medium">Uploaded Files</h3>
-                      <span className="text-xs text-muted-foreground">
-                        Total: {(uploadedFiles.reduce((sum, f) => sum + f.size, 0) / 1024 / 1024).toFixed(2)}MB / 100MB
-                      </span>
-                    </div>
+                    <h3 className="mb-2 font-medium">Uploaded Files</h3>
                     <div className="space-y-2">
                         {uploadedFiles.map(file => (
                             <div key={file.name} className="flex items-center justify-between p-2 rounded-md bg-muted/50 text-sm">
-                                <div className="flex-1 truncate">
-                                  <span className="truncate">{file.name}</span>
-                                  <span className="text-xs text-muted-foreground ml-2">
-                                    ({(file.size / 1024 / 1024).toFixed(2)}MB)
-                                  </span>
-                                </div>
+                                <span className="truncate">{file.name}</span>
                                 <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeFile(file.name)}>
                                     <Trash2 className="h-4 w-4" />
                                 </Button>

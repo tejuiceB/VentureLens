@@ -39,6 +39,7 @@ next-env.d.ts
 
 .genkit/*
 .env*
+agents-473403-firebase-adminsdk-fbsvc-bfc0d9a306.json
 # firebase
 firebase-debug.log
 firestore-debug.log

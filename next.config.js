@@ -30,13 +30,10 @@ pathname: '/**',
   },
   experimental: {
     serverActions: {
-      bodySizeLimit: '100mb', // Max file size for server actions
+      bodySizeLimit: '200mb',
       executionTimeout: 300, // 5 minutes
     },
   },
-  // Optimize for production deployment
-  compress: true,
-  poweredByHeader: false,
 };
 
 module.exports = nextConfig;

@@ -74,21 +74,7 @@ async function getBigQueryBenchmarks(sector: string, stage: string) {
       return getMockBenchmarkData(sector, stage);
     }
 
-    // Initialize BigQuery with credentials from environment variable
-    let bigquery;
-    const serviceAccountKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
-    
-    if (serviceAccountKey) {
-      // Parse and use the service account credentials
-      const credentials = JSON.parse(serviceAccountKey);
-      bigquery = new BigQuery({ 
-        projectId,
-        credentials 
-      });
-    } else {
-      // Fallback to Application Default Credentials
-      bigquery = new BigQuery({ projectId });
-    }
+    const bigquery = new BigQuery({ projectId });
 
     // Sanitize inputs to prevent SQL injection
     const safeSector = sector.replace(/[^a-zA-Z0-9_]/g, '');
