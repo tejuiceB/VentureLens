@@ -264,95 +264,149 @@ Built with Google's Genkit framework, each agent handles a specific task:
 
 ---
 
-## 🚀 Getting Started
+## 🎯 Use Cases
 
-### Prerequisites
+### **For Angel Investors**
+- **Quick Portfolio Screening**: Evaluate 10+ startups per day instead of 1-2
+- **Risk Mitigation**: AI detects red flags you might miss in manual review
+- **Benchmark Comparisons**: Know if valuations are fair for the sector/stage
+- **Due Diligence Reports**: Professional analysis to share with co-investors
 
-- **Node.js** 20.x or higher
-- **npm** or **yarn** package manager
-- **Firebase project** with authentication and Firestore enabled
-- **Google Cloud account** with Vertex AI API enabled
-- **Gemini API key** for AI agent operations
+### **For Venture Capital Firms**
+- **Deal Flow Management**: Process 100+ inbound pitches per month efficiently
+- **Associate Productivity**: Junior analysts generate senior-quality memos
+- **Pattern Recognition**: AI spots trends across portfolio companies
+- **LP Reporting**: Export compliance reports for limited partners
 
-### Installation
+### **For Startup Accelerators**
+- **Application Review**: Score 500+ applications in days, not weeks
+- **Cohort Selection**: Data-driven decisions on which startups to admit
+- **Progress Tracking**: Benchmark cohort companies against industry standards
+- **Investor Matching**: Find VCs whose thesis aligns with each startup
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/tejuiceB/VentureLens.git
-   cd VentureLens
-   ```
+### **For Corporate VCs**
+- **Strategic Fit Analysis**: Evaluate if startups align with parent company goals
+- **M&A Target Identification**: Find acquisition candidates matching criteria
+- **Competitive Intelligence**: Track emerging players in your industry
+- **Partnership Opportunities**: Identify startups for pilot programs
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+### **For Family Offices**
+- **Diversification Strategy**: Build balanced portfolio across sectors/stages
+- **Risk-Adjusted Returns**: Focus on startups matching risk tolerance
+- **Direct Investments**: Skip middlemen with professional analysis tools
+- **Succession Planning**: Teach next generation with AI-guided framework
 
-3. **Set up environment variables**
-   Create a `.env.local` file in the root directory:
-   ```env
-   # Firebase Configuration
-   NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
-   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
-   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
-   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
-   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-   NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
-
-   # Firebase Admin (Server-side)
-   FIREBASE_ADMIN_PROJECT_ID=your_project_id
-   FIREBASE_ADMIN_CLIENT_EMAIL=your_client_email
-   FIREBASE_ADMIN_PRIVATE_KEY=your_private_key
-
-   # Google AI - Gemini & Vertex AI
-   GOOGLE_GENAI_API_KEY=your_gemini_api_key
-   GOOGLE_CLOUD_PROJECT=your_gcp_project_id
-   GOOGLE_CLOUD_LOCATION=us-central1
-   ```
-
-4. **Run the development server**
-   ```bash
-   npm run dev
-   ```
-   
-   Visit [http://localhost:9002](http://localhost:9002)
-
-### Build for Production
-
-```bash
-npm run build
-npm start
-```
 ---
 
-## 🤖 AI Agents Built with Google ADK
+## 📊 Example Outputs
 
-Our platform uses Google Agent Development Kit to build specialized agents powered by Vertex AI and Gemini:
+### **Deal Score Breakdown**
+```
+Startup: CloudSync AI
+Overall Score: 78/100 (Strong Investment Opportunity)
 
-### Agent Catalog
+Team (25 points): 21/25 ⭐⭐⭐⭐
+  • Founding team has 15+ years combined experience
+  • CEO previously exited $50M SaaS company
+  • Advisory board includes 3 Fortune 500 CTOs
 
-| Agent | Input | Output | Purpose |
-|------|-------|--------|---------|
-| **Profiler Agent** | Questionnaire responses | InvestorProfile | Generate comprehensive risk profile using Gemini analysis |
-| **Matching Agent** | InvestorProfile | Startup[] with scores | Match startups to investor criteria with semantic search |
-| **Analyzer Agent** | Files + Criteria | Investment memo, flashcards, audio script | Comprehensive document analysis via Gemini multimodal |
-| **Q&A Agent** | Question + Documents | Answer + Sources | Conversational Q&A using RAG with Vertex AI embeddings |
-| **Compliance Agent** | Startup + Criteria | Compliance report | Regulatory assessment powered by Gemini reasoning |
-| **Scheduler Agent** | Investor + Startup | Meeting details + Calendar link | Smart meeting scheduling with context generation |
+Market (20 points): 18/20 ⭐⭐⭐⭐
+  • $12B TAM in cloud automation space
+  • Growing at 25% CAGR through 2028
+  • Low competition in AI-native segment
 
-### How Agents Work
+Traction (25 points): 19/25 ⭐⭐⭐⭐
+  • $2.4M ARR (Top 15% for Series A SaaS)
+  • 140% net revenue retention
+  • 45 enterprise customers, 12-month contracts
 
-Each agent is built using Google's Agent Development Kit (ADK), which provides:
+Product (15 points): 10/15 ⭐⭐⭐
+  • Strong differentiation with AI copilot
+  • MVP launched, needs UX polish
+  • Roadmap shows 8 requested features
 
-**Core Components:**
-- **Agent Orchestration**: Coordinates multiple agents working together on complex tasks
-- **Vertex AI Integration**: Leverages enterprise-grade AI models for scalable inference
-- **Gemini Pro**: Powers natural language understanding, generation, and multimodal analysis
-- **State Management**: Uses Firebase for real-time agent memory and context persistence
-- **Type Safety**: Zod schemas ensure reliable data flow between agents
+Financials (15 points): 10/15 ⭐⭐⭐
+  • 18-month runway at current burn
+  • LTV/CAC ratio: 2.8 (industry avg: 3.0)
+  • Gross margin: 72%
+```
 
-**Agent Workflow:**
-1. User input is validated and processed
-2. Agent receives context from previous agents via shared Firebase state
-3. Agent calls Gemini (via Vertex AI) with structured prompts
-4. Response is validated, formatted, and stored
-5. Next agent in chain receives updated context
+### **Risk Analysis**
+```
+Financial Health: 🟢 GREEN
+  ✓ Sufficient runway (18 months)
+  ✓ Improving unit economics
+  ⚠ High burn rate requires close monitoring
+
+Market Viability: 🟢 GREEN
+  ✓ Large addressable market ($12B)
+  ✓ Clear product-market fit
+  ✓ Multiple revenue streams
+
+Team Concerns: 🟡 YELLOW
+  ⚠ No CTO on founding team (advisory CTO only)
+  ✓ Strong engineering culture
+  ✓ Low employee turnover
+
+Legal/Compliance: 🟢 GREEN
+  ✓ Clean cap table
+  ✓ All IP properly assigned
+  ✓ No ongoing litigation
+```
+
+### **Sector Benchmarking**
+```
+CloudSync AI vs. Series A SaaS Benchmarks
+
+ARR: $2.4M
+  ├─ Sector Average: $1.8M
+  └─ Your Percentile: 70th ⭐⭐⭐⭐ (Top 30%)
+
+Growth Rate: 140% YoY
+  ├─ Sector Average: 120%
+  └─ Your Percentile: 75th ⭐⭐⭐⭐ (Top 25%)
+
+Team Size: 22 employees
+  ├─ Sector Average: 28
+  └─ Your Percentile: 35th ⭐⭐ (Below average)
+
+Efficiency (LTV/CAC): 2.8x
+  ├─ Sector Average: 3.0x
+  └─ Your Percentile: 45th ⭐⭐⭐ (Average)
+
+Verdict: Strong performer on revenue metrics, 
+could optimize team efficiency and unit economics.
+```
+
+---
+
+## 🚀 Live Demo
+
+**Try it now:** [venturelens.vercel.app](https://venturelens.vercel.app)
+
+No sign-up required to explore features. Create a profile to unlock full analysis.
+
+---
+
+## 📫 Contact & Support
+
+- **GitHub**: [@tejuiceB](https://github.com/tejuiceB)
+- **Project**: [VentureLens Repository](https://github.com/tejuiceB/VentureLens)
+- **Deployment**: Available on Vercel and Google Cloud Run
+- **Documentation**: See `DEPLOYMENT.md` for setup instructions
+
+---
+
+## 📄 License
+
+MIT License - See LICENSE file for details
+
+---
+
+<div align="center">
+
+**Built with ❤️ using Google's Gemini 2.5 Flash AI**
+
+*Transforming startup evaluation from weeks to minutes*
+
+</div>
