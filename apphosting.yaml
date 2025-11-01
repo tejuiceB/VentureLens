@@ -4,4 +4,20 @@
 runConfig:
   # Increase this value if you'd like to automatically spin up
   # more instances in response to increased traffic.
-  maxInstances: 1
+  minInstances: 0
+  maxInstances: 10
+  concurrency: 80
+  cpu: 1
+  memoryMiB: 512
+
+  # Environment variables - Add your secrets in Firebase Console
+  # https://console.firebase.google.com/project/agents-473403/apphosting
+  env:
+    - variable: GOOGLE_CLOUD_PROJECT_ID
+      value: agents-473403
+    - variable: GOOGLE_CLOUD_LOCATION
+      value: us-central1
+    - variable: BIGQUERY_DATASET_ID
+      value: startup_benchmarks
+    - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+      value: agents-473403

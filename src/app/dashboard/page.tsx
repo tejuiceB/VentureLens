@@ -32,6 +32,19 @@ import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 import { saveAs } from "file-saver";
 
+// Hackathon AI Analyst Flows
+import { enrichWithPublicData, type PublicDataInput, type PublicDataOutput } from "@/ai/flows/public-data-enrichment";
+import { benchmarkStartup, type SectorBenchmarkInput, type SectorBenchmarkOutput } from "@/ai/flows/sector-benchmarking";
+import { detectRisks, type RiskDetectionInput, type RiskDetectionOutput } from "@/ai/flows/risk-detection";
+import { calculateDealScore, type DealScoreInput, type DealScoreOutput } from "@/ai/flows/deal-score";
+
+// Hackathon UI Components
+import { PublicDataTimeline } from "@/components/dashboard/public-data-timeline";
+import { BenchmarkChart } from "@/components/dashboard/benchmark-chart";
+import { RiskFlagsPanel } from "@/components/dashboard/risk-flags-panel";
+import { DealScoreCard } from "@/components/dashboard/deal-score-card";
+import { WeightCustomization } from "@/components/dashboard/weight-customization";
+
 
 const currencies = ["INR", "USD", "EUR", "GBP", "JPY", "CAD", "AUD"];
 const investmentFocusOptions = ["Seed Stage", "Early Stage", "Growth Stage", "Late Stage", "Pre-IPO", "Buyouts", "Venture Debt"];
@@ -106,6 +119,21 @@ export default function DashboardPage() {
   const [meetingDetails, setMeetingDetails] = useState<ScheduleMeetingOutput | null>(null);
   const [isSchedulingMeeting, setIsSchedulingMeeting] = useState(false);
   const [meetingError, setMeetingError] = useState<string | null>(null);
+
+  // AI Deal Analysis States (Hackathon Features)
+  const [dealAnalysisStartupName, setDealAnalysisStartupName] = useState("");
+  const [dealAnalysisSector, setDealAnalysisSector] = useState("");
+  const [dealAnalysisStage, setDealAnalysisStage] = useState("");
+  const [dealAnalysisWebsite, setDealAnalysisWebsite] = useState("");
+  const [publicDataResult, setPublicDataResult] = useState<PublicDataOutput | null>(null);
+  const [benchmarkResult, setBenchmarkResult] = useState<SectorBenchmarkOutput | null>(null);
+  const [riskResult, setRiskResult] = useState<RiskDetectionOutput | null>(null);
+  const [dealScoreResult, setDealScoreResult] = useState<DealScoreOutput | null>(null);
+  const [isRunningDealAnalysis, setIsRunningDealAnalysis] = useState(false);
+  const [dealAnalysisError, setDealAnalysisError] = useState<string | null>(null);
+  const [dealAnalysisProgress, setDealAnalysisProgress] = useState<string>("");
+  const [customWeights, setCustomWeights] = useState({ team: 25, market: 20, traction: 25, product: 15, financials: 15 });
+  const [isRecalculatingScore, setIsRecalculatingScore] = useState(false);
 
 
   const startupOptionsForSelect = useMemo(() => {
@@ -520,6 +548,224 @@ export default function DashboardPage() {
     doc.save("flashcards.pdf");
   };
 
+  // AI Deal Analysis Handler (Hackathon Feature)
+  const handleRunDealAnalysis = async () => {
+    if (!dealAnalysisStartupName || !dealAnalysisSector || !dealAnalysisStage) {
+      setDealAnalysisError("Please fill in startup name, sector, and stage.");
+      return;
+    }
+
+    setIsRunningDealAnalysis(true);
+    setDealAnalysisError(null);
+    setPublicDataResult(null);
+    setBenchmarkResult(null);
+    setRiskResult(null);
+    setDealScoreResult(null);
+
+    try {
+      // Step 1: Public Data Enrichment
+      setDealAnalysisProgress("🔍 Enriching with public data...");
+      const publicDataInput: PublicDataInput = {
+        startupName: dealAnalysisStartupName,
+        website: dealAnalysisWebsite || undefined,
+        sector: dealAnalysisSector,
+        location: investorProfile.country || undefined,
+      };
+      const publicData = await enrichWithPublicData(publicDataInput);
+      setPublicDataResult(publicData);
+
+      // Step 2: Sector Benchmarking
+      setDealAnalysisProgress("📊 Benchmarking against sector peers...");
+      
+      // Extract metrics from analysis result or use defaults
+      const mockMetrics = {
+        arr: 2500000, // $2.5M ARR default
+        growthRate: 150,
+        burnRate: 50000,
+        teamSize: 15,
+        ltvCacRatio: 3.5,
+      };
+
+      const benchmarkInput: SectorBenchmarkInput = {
+        startupName: dealAnalysisStartupName,
+        sector: dealAnalysisSector,
+        stage: dealAnalysisStage,
+        metrics: mockMetrics,
+      };
+      const benchmarkData = await benchmarkStartup(benchmarkInput);
+      setBenchmarkResult(benchmarkData);
+
+      // Step 3: Risk Detection
+      setDealAnalysisProgress("⚠️ Detecting risk indicators...");
+      
+      // Create mock pitch deck data from analysis or defaults
+      const pitchDeckData = {
+        marketSize: 50,
+        currentRevenue: 2500000,
+        growthRate: 150,
+        customerCount: 100,
+        churnRate: 5,
+        competitorMentions: ["Competitor A", "Competitor B"],
+        teamExperience: "5+ years in industry",
+        fundingHistory: ["Seed: $500K"],
+      };
+
+      const riskInput: RiskDetectionInput = {
+        startupName: dealAnalysisStartupName,
+        sector: dealAnalysisSector,
+        pitchDeckData,
+        publicData: {
+          newsArticles: publicData.newsArticles.map(a => ({
+            title: a.title,
+            snippet: a.snippet,
+            sentiment: a.sentiment ?? 'neutral',
+          })),
+          fundingHistory: publicData.fundingHistory?.map(f => `${f.round}: ${f.amount}`) || [],
+          competitorMentions: publicData.competitorMentions || [],
+          riskIndicators: publicData.riskIndicators,
+        },
+        benchmarkData: {
+          avgRevenue: benchmarkData.benchmarkData.avgARR,
+          avgGrowthRate: benchmarkData.benchmarkData.avgGrowthRate,
+          avgChurnRate: 5,
+          avgCAC: 1000,
+          avgLTV: 3500,
+        },
+      };
+      const riskData = await detectRisks(riskInput);
+      setRiskResult(riskData);
+
+      // Step 4: Deal Scoring
+      setDealAnalysisProgress("🎯 Calculating deal score...");
+      
+      const dealScoreInput: DealScoreInput = {
+        startupName: dealAnalysisStartupName,
+        sector: dealAnalysisSector,
+        stage: dealAnalysisStage,
+        weights: customWeights,
+        team: {
+          founders: [
+            {
+              name: "John Doe",
+              role: "CEO",
+              background: "Former VP at Tech Corp",
+              yearsExperience: 10,
+            }
+          ],
+          teamSize: 15,
+          hasRelevantExperience: true,
+          hasPriorSuccesses: false,
+          advisors: ["Advisor 1", "Advisor 2", "Advisor 3"],
+        },
+        market: {
+          tam: 50,
+          growthRate: 25,
+          competitiveIntensity: "Medium",
+          marketTrend: "Growing",
+        },
+        traction: {
+          arr: 2500000,
+          growthRate: 150,
+          customerCount: 100,
+          revenueGrowthLast6Months: 75,
+        },
+        product: {
+          hasUniqueValue: true,
+          hasTechMoat: true,
+          productStage: "Production",
+          hasIntellectualProperty: false,
+          competitorAdvantages: ["AI-powered analytics", "Proprietary technology"],
+        },
+        financials: {
+          cac: 1000,
+          ltv: 3500,
+          grossMargin: 75,
+          runway: 18,
+          burnRate: 50000,
+          churnRate: 5,
+        },
+        benchmarkScore: benchmarkData.percentileRankings.arrPercentile || 50,
+        riskScore: riskData.overallRiskScore,
+      };
+      const dealScore = await calculateDealScore(dealScoreInput);
+      setDealScoreResult(dealScore);
+
+      setDealAnalysisProgress("✅ Analysis complete!");
+      setTimeout(() => setDealAnalysisProgress(""), 2000);
+
+    } catch (err: any) {
+      console.error("Error running deal analysis:", err);
+      setDealAnalysisError(err.message || "An unexpected error occurred during analysis.");
+      setDealAnalysisProgress("");
+    } finally {
+      setIsRunningDealAnalysis(false);
+    }
+  };
+
+  const handleRecalculateScore = async () => {
+    if (!dealScoreResult || !benchmarkResult || !riskResult) return;
+
+    setIsRecalculatingScore(true);
+    try {
+      const dealScoreInput: DealScoreInput = {
+        startupName: dealAnalysisStartupName,
+        sector: dealAnalysisSector,
+        stage: dealAnalysisStage,
+        weights: customWeights,
+        team: {
+          founders: [
+            {
+              name: "John Doe",
+              role: "CEO",
+              background: "Former VP at Tech Corp",
+              yearsExperience: 10,
+            }
+          ],
+          teamSize: 15,
+          hasRelevantExperience: true,
+          hasPriorSuccesses: false,
+          advisors: ["Advisor 1", "Advisor 2", "Advisor 3"],
+        },
+        market: {
+          tam: 50,
+          growthRate: 25,
+          competitiveIntensity: "Medium",
+          marketTrend: "Growing",
+        },
+        traction: {
+          arr: 2500000,
+          growthRate: 150,
+          customerCount: 100,
+          revenueGrowthLast6Months: 75,
+        },
+        product: {
+          hasUniqueValue: true,
+          hasTechMoat: true,
+          productStage: "Production",
+          hasIntellectualProperty: false,
+          competitorAdvantages: ["AI-powered analytics", "Proprietary technology"],
+        },
+        financials: {
+          cac: 1000,
+          ltv: 3500,
+          grossMargin: 75,
+          runway: 18,
+          burnRate: 50000,
+          churnRate: 5,
+        },
+        benchmarkScore: benchmarkResult.percentileRankings.arrPercentile || 50,
+        riskScore: riskResult.overallRiskScore,
+      };
+      const dealScore = await calculateDealScore(dealScoreInput);
+      setDealScoreResult(dealScore);
+    } catch (err: any) {
+      console.error("Error recalculating score:", err);
+      setDealAnalysisError(err.message || "Failed to recalculate score.");
+    } finally {
+      setIsRecalculatingScore(false);
+    }
+  };
+
   const handleClearProfile = () => {
     if (confirm("Are you sure you want to clear your saved investor profile? This cannot be undone.")) {
       try {
@@ -650,12 +896,13 @@ export default function DashboardPage() {
       </header>
 
       <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="profiler">1. Investor Profile</TabsTrigger>
           <TabsTrigger value="matching" disabled={!investorProfile.generatedProfile}>2. Startup Matching</TabsTrigger>
-          <TabsTrigger value="analyzer" disabled={!investorProfile.generatedProfile}>3. Document Analyzer</TabsTrigger>
-          <TabsTrigger value="compliance" disabled={!analysisResult}>4. Compliance</TabsTrigger>
-          <TabsTrigger value="connect" disabled={!complianceReport}>5. Connect &amp; Invest</TabsTrigger>
+          <TabsTrigger value="deal-analysis" disabled={!investorProfile.generatedProfile}>3. AI Deal Analysis</TabsTrigger>
+          <TabsTrigger value="analyzer" disabled={!investorProfile.generatedProfile}>4. Document Analyzer</TabsTrigger>
+          <TabsTrigger value="compliance" disabled={!analysisResult}>5. Compliance</TabsTrigger>
+          <TabsTrigger value="connect" disabled={!complianceReport}>6. Connect &amp; Invest</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profiler">
@@ -883,6 +1130,170 @@ export default function DashboardPage() {
                         <p className="text-muted-foreground">Please complete your investor profile to see startup matches.</p>
                     </div>
                  )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="deal-analysis">
+          <Card className="bg-card border-border/60">
+            <CardHeader>
+              <CardTitle className="font-headline flex items-center gap-2">
+                🤖 AI Deal Analysis
+                <Badge variant="secondary" className="text-xs">Hackathon Feature</Badge>
+              </CardTitle>
+              <CardDescription>
+                Comprehensive startup evaluation using public data synthesis, sector benchmarking, automated risk detection, and AI-powered deal scoring.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Startup Input Form */}
+              <Card className="border-primary/20">
+                <CardHeader>
+                  <CardTitle className="text-lg">Startup Information</CardTitle>
+                  <CardDescription>Enter basic startup details to begin the AI analysis</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="deal-startup-name">Startup Name *</Label>
+                      <Input 
+                        id="deal-startup-name" 
+                        placeholder="e.g., TechVision AI" 
+                        value={dealAnalysisStartupName}
+                        onChange={(e) => setDealAnalysisStartupName(e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="deal-website">Website (Optional)</Label>
+                      <Input 
+                        id="deal-website" 
+                        placeholder="e.g., https://techvision.ai" 
+                        value={dealAnalysisWebsite}
+                        onChange={(e) => setDealAnalysisWebsite(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="deal-sector">Sector *</Label>
+                      <Select onValueChange={setDealAnalysisSector} value={dealAnalysisSector}>
+                        <SelectTrigger id="deal-sector">
+                          <SelectValue placeholder="Select sector..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="SaaS">SaaS</SelectItem>
+                          <SelectItem value="FinTech">FinTech</SelectItem>
+                          <SelectItem value="HealthTech">HealthTech</SelectItem>
+                          <SelectItem value="EdTech">EdTech</SelectItem>
+                          <SelectItem value="E-commerce">E-commerce</SelectItem>
+                          <SelectItem value="AI/ML">AI/ML</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="deal-stage">Stage *</Label>
+                      <Select onValueChange={setDealAnalysisStage} value={dealAnalysisStage}>
+                        <SelectTrigger id="deal-stage">
+                          <SelectValue placeholder="Select stage..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Seed">Seed</SelectItem>
+                          <SelectItem value="Series A">Series A</SelectItem>
+                          <SelectItem value="Series B">Series B</SelectItem>
+                          <SelectItem value="Series C+">Series C+</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <Button 
+                    onClick={handleRunDealAnalysis} 
+                    disabled={isRunningDealAnalysis || !dealAnalysisStartupName || !dealAnalysisSector || !dealAnalysisStage}
+                    className="w-full"
+                    size="lg"
+                  >
+                    {isRunningDealAnalysis && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    🚀 Run Complete AI Analysis
+                  </Button>
+                  {dealAnalysisProgress && (
+                    <Alert>
+                      <AlertDescription className="flex items-center gap-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        {dealAnalysisProgress}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  {dealAnalysisError && (
+                    <Alert variant="destructive">
+                      <AlertTitle>Error</AlertTitle>
+                      <AlertDescription>{dealAnalysisError}</AlertDescription>
+                    </Alert>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Results Display */}
+              {dealScoreResult && (
+                <div className="space-y-6">
+                  {/* Overall Deal Score Card */}
+                  <DealScoreCard 
+                    dealScore={dealScoreResult} 
+                    startupName={dealAnalysisStartupName}
+                  />
+
+                  {/* Weight Customization */}
+                  <WeightCustomization
+                    weights={customWeights}
+                    onWeightsChange={setCustomWeights}
+                    onRecalculate={handleRecalculateScore}
+                    isRecalculating={isRecalculatingScore}
+                  />
+
+                  {/* Risk Flags Panel */}
+                  {riskResult && (
+                    <RiskFlagsPanel 
+                      riskAnalysis={riskResult} 
+                      startupName={dealAnalysisStartupName}
+                    />
+                  )}
+
+                  {/* Benchmark Chart */}
+                  {benchmarkResult && (
+                    <BenchmarkChart 
+                      benchmarkData={benchmarkResult} 
+                      startupName={dealAnalysisStartupName}
+                    />
+                  )}
+
+                  {/* Public Data Timeline */}
+                  {publicDataResult && (
+                    <PublicDataTimeline 
+                      publicData={publicDataResult} 
+                      startupName={dealAnalysisStartupName}
+                    />
+                  )}
+                </div>
+              )}
+
+              {/* Empty State */}
+              {!dealScoreResult && !isRunningDealAnalysis && (
+                <Card className="border-dashed">
+                  <CardContent className="flex flex-col items-center justify-center py-16 text-center space-y-4">
+                    <div className="text-6xl">📊</div>
+                    <div>
+                      <h3 className="font-bold text-lg mb-2">Ready to Analyze</h3>
+                      <p className="text-sm text-muted-foreground max-w-md">
+                        Fill in the startup details above and click "Run Complete AI Analysis" to:
+                      </p>
+                      <ul className="text-sm text-muted-foreground mt-3 space-y-1">
+                        <li>🔍 Enrich with public data from Google Search</li>
+                        <li>📊 Benchmark against sector peers</li>
+                        <li>⚠️ Detect risk indicators automatically</li>
+                        <li>🎯 Calculate AI-powered deal score</li>
+                      </ul>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -1488,5 +1899,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    

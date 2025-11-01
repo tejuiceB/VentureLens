@@ -5,7 +5,6 @@ import { Twitter, Linkedin, Facebook } from 'lucide-react';
 const navLinks = [
   { href: '/features', label: 'Features' },
   { href: '/how-it-works', label: 'How it works' },
-  { href: '/compliance', label: 'Compliance' },
 ];
 
 const socialLinks = [
