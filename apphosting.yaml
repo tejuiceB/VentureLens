@@ -16,6 +16,7 @@ runConfig:
   # - GEMINI_API_KEY
   # - GOOGLE_SEARCH_API_KEY
   # - NEXT_PUBLIC_FIREBASE_API_KEY
+  # - GOOGLE_SERVICE_ACCOUNT_KEY (the full JSON service account credentials)
   env:
     - variable: GOOGLE_CLOUD_PROJECT_ID
       value: agents-473403

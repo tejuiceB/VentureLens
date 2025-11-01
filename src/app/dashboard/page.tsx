@@ -253,6 +253,16 @@ export default function DashboardPage() {
   
   const handleFiles = (files: FileList) => {
     const newFiles = Array.from(files);
+    
+    // Check individual file sizes
+    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB per file
+    const oversizedFiles = newFiles.filter(file => file.size > MAX_FILE_SIZE);
+    
+    if (oversizedFiles.length > 0) {
+      setAnalyzerError(`The following files exceed the 2MB limit: ${oversizedFiles.map(f => `${f.name} (${(f.size / 1024 / 1024).toFixed(2)}MB)`).join(', ')}. Please upload smaller files.`);
+      return;
+    }
+    
     setUploadedFiles(prev => {
         const updatedFiles = [...prev, ...newFiles];
         // Reset subsequent steps whenever files change
@@ -290,6 +300,15 @@ export default function DashboardPage() {
     }
     if (!customStartupName.trim()) {
       setAnalyzerError("Please enter the startup name you're analyzing.");
+      return;
+    }
+
+    // Check total file size to prevent 413 errors on Vercel
+    const MAX_TOTAL_SIZE = 3 * 1024 * 1024; // 3MB limit (base64 encoding adds ~33% overhead)
+    const totalSize = uploadedFiles.reduce((sum, file) => sum + file.size, 0);
+    
+    if (totalSize > MAX_TOTAL_SIZE) {
+      setAnalyzerError(`Total file size (${(totalSize / 1024 / 1024).toFixed(2)}MB) exceeds the 3MB limit. Please upload smaller files or fewer documents.`);
       return;
     }
 
@@ -374,7 +393,31 @@ export default function DashboardPage() {
 
     } catch (err: any) {
       console.error("Error analyzing files:", err);
-      setAnalyzerError(err.message || "An unexpected error occurred during analysis.");
+      
+      // Extract detailed error message
+      let errorMessage = "An unexpected error occurred during analysis.";
+      if (err.message) {
+        errorMessage = err.message;
+      } else if (err.digest) {
+        errorMessage = `Server error (${err.digest}). This may be due to file size limits or API issues.`;
+      } else if (typeof err === 'string') {
+        errorMessage = err;
+      }
+      
+      // Add helpful context based on error type
+      if (errorMessage.includes('413') || errorMessage.includes('Too Large')) {
+        errorMessage = "Request too large. Please upload smaller files (max 2MB each, 3MB total) or fewer documents.";
+      } else if (errorMessage.includes('credentials') || errorMessage.includes('authentication')) {
+        errorMessage += " - API credentials may be misconfigured.";
+      } else if (errorMessage.includes('timeout')) {
+        errorMessage += " - Analysis timed out. Try with fewer/smaller files.";
+      } else if (errorMessage.includes('429')) {
+        errorMessage += " - API rate limit exceeded. Please wait a moment.";
+      } else if (errorMessage.includes('Failed to fetch') || errorMessage.includes('network')) {
+        errorMessage = "Network error. Please check your connection and try again.";
+      }
+      
+      setAnalyzerError(errorMessage);
     } finally {
       setIsAnalyzing(false);
     }
@@ -695,7 +738,27 @@ export default function DashboardPage() {
 
     } catch (err: any) {
       console.error("Error running deal analysis:", err);
-      setDealAnalysisError(err.message || "An unexpected error occurred during analysis.");
+      
+      // Extract detailed error message
+      let errorMessage = "An unexpected error occurred during analysis.";
+      if (err.message) {
+        errorMessage = err.message;
+      } else if (err.digest) {
+        errorMessage = `Server error (${err.digest}). Please check your inputs and try again.`;
+      } else if (typeof err === 'string') {
+        errorMessage = err;
+      }
+      
+      // Add helpful context
+      if (errorMessage.includes('credentials') || errorMessage.includes('authentication')) {
+        errorMessage += " - API credentials may be misconfigured.";
+      } else if (errorMessage.includes('timeout')) {
+        errorMessage += " - Request timed out. Please try again.";
+      } else if (errorMessage.includes('429')) {
+        errorMessage += " - API rate limit exceeded. Please wait a moment.";
+      }
+      
+      setDealAnalysisError(errorMessage);
       setDealAnalysisProgress("");
     } finally {
       setIsRunningDealAnalysis(false);
@@ -1384,6 +1447,7 @@ export default function DashboardPage() {
                       <FileUp className="w-10 h-10 mb-3 text-muted-foreground" />
                       <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Click to upload</span> or drag and drop</p>
                       <p className="text-xs text-muted-foreground">PDF, TXT, EML, DOCX, XLSX</p>
+                      <p className="text-xs text-amber-600 dark:text-amber-500 mt-1">⚠️ Max 2MB per file, 3MB total</p>
                   </div>
                 </Label>
                 {dragActive && <div className="absolute inset-0" onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}></div>}
@@ -1391,11 +1455,14 @@ export default function DashboardPage() {
 
               {uploadedFiles.length > 0 && (
                 <div>
-                    <h3 className="mb-2 font-medium">Uploaded Files</h3>
+                    <h3 className="mb-2 font-medium">Uploaded Files ({(uploadedFiles.reduce((sum, f) => sum + f.size, 0) / 1024 / 1024).toFixed(2)}MB total)</h3>
                     <div className="space-y-2">
                         {uploadedFiles.map(file => (
                             <div key={file.name} className="flex items-center justify-between p-2 rounded-md bg-muted/50 text-sm">
-                                <span className="truncate">{file.name}</span>
+                                <div className="flex-1 truncate">
+                                  <span className="truncate">{file.name}</span>
+                                  <span className="text-xs text-muted-foreground ml-2">({(file.size / 1024).toFixed(0)}KB)</span>
+                                </div>
                                 <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeFile(file.name)}>
                                     <Trash2 className="h-4 w-4" />
                                 </Button>
