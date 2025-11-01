@@ -13,7 +13,18 @@ import * as admin from 'firebase-admin';
 
 // Initialize Firebase Admin SDK if not already initialized
 if (!admin.apps.length) {
-  admin.initializeApp();
+  const serviceAccountKey = process.env.GOOGLE_SERVICE_ACCOUNT_KEY;
+  
+  if (serviceAccountKey) {
+    // Parse the service account JSON from environment variable
+    const serviceAccount = JSON.parse(serviceAccountKey);
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+    });
+  } else {
+    // Fallback to default credentials (for local dev or if GOOGLE_APPLICATION_CREDENTIALS is set)
+    admin.initializeApp();
+  }
 }
 
 
