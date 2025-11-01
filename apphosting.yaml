@@ -7,8 +7,10 @@ runConfig:
   minInstances: 0
   maxInstances: 10
   concurrency: 80
-  cpu: 1
-  memoryMiB: 512
+  cpu: 2
+  memoryMiB: 1024
+  # Increase timeout for large file processing
+  timeoutSeconds: 300
 
   # Environment variables - Add your secrets in Firebase Console
   # https://console.firebase.google.com/project/agents-473403/apphosting
@@ -16,7 +18,6 @@ runConfig:
   # - GEMINI_API_KEY
   # - GOOGLE_SEARCH_API_KEY
   # - NEXT_PUBLIC_FIREBASE_API_KEY
-  # - GOOGLE_SERVICE_ACCOUNT_KEY (the full JSON service account credentials)
   env:
     - variable: GOOGLE_CLOUD_PROJECT_ID
       value: agents-473403

@@ -1,8 +1,29 @@
 {
-  "rewrites": [
+  "functions": {
+    "app/dashboard/page.tsx": {
+      "maxDuration": 300
+    },
+    "api/**": {
+      "maxDuration": 300
+    }
+  },
+  "headers": [
     {
       "source": "/(.*)",
-      "destination": "/"
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
     }
   ]
 }
