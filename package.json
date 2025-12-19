@@ -82,7 +82,7 @@
     "typescript": "^5"
   },
   "overrides": {
-    "next": "14.2.5",
+    "next": "14.2.35",
     "genkit": "1.8.0",
     "@genkit-ai/next": "1.8.0",
     "@genkit-ai/googleai": "1.8.0"
